@@ -920,7 +920,121 @@
     });
 
     // Derive cryptographic PBKDF2 AES-GCM-256 key
-    async function deriveKey(passwordString) {
+
+    // Include security.js functions
+    const MAX_FAILED_ATTEMPTS = 3;
+    const BASE_COOLDOWN_MS = 30000;
+
+    function getFailedAttempts() {
+        return parseInt(localStorage.getItem("lockbox_failed_attempts") || "0", 10);
+    }
+
+    function setFailedAttempts(count) {
+        localStorage.setItem("lockbox_failed_attempts", count.toString());
+    }
+
+    function getLockoutEndTime() {
+        return parseInt(localStorage.getItem("lockbox_lockout_end_time") || "0", 10);
+    }
+
+    function setLockoutEndTime(time) {
+        localStorage.setItem("lockbox_lockout_end_time", time.toString());
+    }
+
+    function checkRateLimit() {
+        const lockoutEndTime = getLockoutEndTime();
+        if (Date.now() < lockoutEndTime) {
+            const remainingTime = Math.ceil((lockoutEndTime - Date.now()) / 1000);
+            throw new Error(`Too many failed attempts. Try again in ${remainingTime} seconds.`);
+        }
+    }
+
+    function recordFailedAttempt() {
+        let attempts = getFailedAttempts() + 1;
+        setFailedAttempts(attempts);
+
+        if (attempts >= MAX_FAILED_ATTEMPTS) {
+            const multiplier = Math.pow(2, attempts - MAX_FAILED_ATTEMPTS);
+            const cooldown = BASE_COOLDOWN_MS * multiplier;
+            setLockoutEndTime(Date.now() + cooldown);
+            throw new Error(`Too many failed attempts. Try again in ${cooldown / 1000} seconds.`);
+        }
+    }
+
+    function resetRateLimit() {
+        setFailedAttempts(0);
+        setLockoutEndTime(0);
+    }
+
+    async function verifyMasterPassword(passwordInput) {
+        checkRateLimit();
+
+        const storedHash = localStorage.getItem("lockbox_master_hash");
+        const storedSaltBase64 = localStorage.getItem("lockbox_master_salt");
+
+        if (!storedHash || !storedSaltBase64) {
+            await setMasterPassword(passwordInput);
+            resetRateLimit();
+            return await deriveKey(passwordInput, getStoredSalt());
+        }
+
+        const salt = Uint8Array.from(atob(storedSaltBase64), c => c.charCodeAt(0));
+
+        const hash = await hashPassword(passwordInput, salt);
+
+        if (hash === storedHash) {
+            resetRateLimit();
+            return await deriveKey(passwordInput, salt);
+        } else {
+            recordFailedAttempt();
+            throw new Error("Invalid master password.");
+        }
+    }
+
+    async function setMasterPassword(password) {
+        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        const saltBase64 = btoa(String.fromCharCode.apply(null, salt));
+
+        const hash = await hashPassword(password, salt);
+
+        localStorage.setItem("lockbox_master_hash", hash);
+        localStorage.setItem("lockbox_master_salt", saltBase64);
+    }
+
+    async function hashPassword(password, salt) {
+        const encoder = new TextEncoder();
+        const baseKey = await window.crypto.subtle.importKey(
+            "raw",
+            encoder.encode(password),
+            "PBKDF2",
+            false,
+            ["deriveBits"]
+        );
+
+        const hashBuffer = await window.crypto.subtle.deriveBits(
+            {
+                name: "PBKDF2",
+                salt: salt,
+                iterations: 100000,
+                hash: "SHA-256"
+            },
+            baseKey,
+            256
+        );
+
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function getStoredSalt() {
+        const storedSaltBase64 = localStorage.getItem("lockbox_master_salt");
+        if(storedSaltBase64) {
+            return Uint8Array.from(atob(storedSaltBase64), c => c.charCodeAt(0));
+        }
+        return null;
+    }
+
+    async function deriveKey(passwordString, salt = SALT) {
         const encoder = new TextEncoder();
         const baseKey = await window.crypto.subtle.importKey(
             "raw",
@@ -933,7 +1047,7 @@
         return await window.crypto.subtle.deriveKey(
             {
                 name: "PBKDF2",
-                salt: SALT,
+                salt: salt,
                 iterations: PBKDF2_ITERATIONS,
                 hash: "SHA-256"
             },
@@ -955,7 +1069,7 @@
         }
 
         try {
-            masterKey = await deriveKey(passwordInput);
+            masterKey = await verifyMasterPassword(passwordInput);
             await loadVault();
 
             // Toggle Vault UI Elements
@@ -972,8 +1086,12 @@
             resetActivityTimer();
             startAutoLockWatcher();
         } catch (e) {
-            errorDiv.textContent = 'Failed to unlock vault. Password incorrect or storage corrupted.';
             console.error(e);
+            if (e.message.startsWith("Too many failed attempts.") || e.message === "Invalid master password.") {
+                errorDiv.textContent = e.message;
+            } else {
+                errorDiv.textContent = 'Failed to unlock vault. Password incorrect or storage corrupted.';
+            }
         }
     }
 
