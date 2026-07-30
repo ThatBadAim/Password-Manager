@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "qFuSxDiEslo=",
+  "success": true,
+  "projectFilePath": "/app/CipherVault/CipherVault.csproj",
+  "expectedPackageFiles": [
+    "/home/jules/.nuget/packages/communitytoolkit.mvvm/8.2.2/communitytoolkit.mvvm.8.2.2.nupkg.sha512",
+    "/home/jules/.nuget/packages/microsoft.windowsdesktop.app.ref/10.0.3/microsoft.windowsdesktop.app.ref.10.0.3.nupkg.sha512",
+    "/home/jules/.nuget/packages/microsoft.windows.sdk.net.ref/10.0.19041.57/microsoft.windows.sdk.net.ref.10.0.19041.57.nupkg.sha512"
+  ],
+  "logs": []
+}
