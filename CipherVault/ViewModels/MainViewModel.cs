@@ -1,3 +1,4 @@
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -16,8 +17,43 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private bool _isPasswordVisible;
 
-        [ObservableProperty]
+
         private string _searchText = string.Empty;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (SetProperty(ref _searchText, value))
+                {
+                    FilterVaultItems();
+                }
+            }
+        }
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _vaultItems = new();
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _filteredVaultItems = new();
+
+        private void FilterVaultItems()
+        {
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                FilteredVaultItems = new ObservableCollection<VaultItem>(VaultItems);
+            }
+            else
+            {
+                var lowerSearch = SearchText.ToLowerInvariant();
+                var filtered = VaultItems.Where(i => i.Title.ToLowerInvariant().Contains(lowerSearch) ||
+                                                     i.Subtitle.ToLowerInvariant().Contains(lowerSearch) ||
+                                                     i.Category.ToLowerInvariant().Contains(lowerSearch) ||
+                                                     i.Username.ToLowerInvariant().Contains(lowerSearch));
+                FilteredVaultItems = new ObservableCollection<VaultItem>(filtered);
+            }
+        }
+
 
         public MainViewModel()
         {
@@ -45,6 +81,9 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            VaultItems.Add(_selectedVaultItem);
+            FilterVaultItems();
         }
 
         [RelayCommand]
@@ -53,7 +92,7 @@ namespace CipherVault.ViewModels
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                MessageBox.Show("Copied to clipboard!", "CipherVault", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 

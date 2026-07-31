@@ -13,18 +13,66 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --bg-color: #0b0c10; /* Dark neutral */
-            --panel-bg: #13151a; /* Solid panel color */
-            --panel-border: #22252d; /* Subtle dark border */
-            --accent: #2563eb; /* Clean standard blue */
-            --accent-hover: #1d4ed8; 
+        :root, [data-theme="deep-slate"] {
+            --bg-base: #0b0c10;
+            --bg-surface: #13151a;
+            --bg-elevated: #1c1f26;
             --text-primary: #f3f4f6;
             --text-secondary: #9ca3af;
-            --text-muted: #6b7280;
-            --danger: #ef4444;
+            --border-subtle: #22252d;
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --status-alert: #ef4444;
             --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        [data-theme="paper-light"] {
+            --bg-base: #f9fafb;
+            --bg-surface: #ffffff;
+            --bg-elevated: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-subtle: #e5e7eb;
+            --accent-primary: #0284c7;
+            --accent-hover: #0369a1;
+            --status-alert: #dc2626;
+        }
+
+        [data-theme="tactical-amber"] {
+            --bg-base: #000000;
+            --bg-surface: #111111;
+            --bg-elevated: #222222;
+            --text-primary: #ffb703;
+            --text-secondary: #fb8500;
+            --border-subtle: #333333;
+            --accent-primary: #ffb703;
+            --accent-hover: #fb8500;
+            --status-alert: #d00000;
+        }
+
+        [data-theme="industrial-steel"] {
+            --bg-base: #2b2d42;
+            --bg-surface: #3a3f58;
+            --bg-elevated: #4a4e69;
+            --text-primary: #edf2f4;
+            --text-secondary: #8d99ae;
+            --border-subtle: #5c677d;
+            --accent-primary: #ef233c;
+            --accent-hover: #d90429;
+            --status-alert: #ff9f1c;
+        }
+
+        [data-theme="organic-earth"] {
+            --bg-base: #283618;
+            --bg-surface: #606c38;
+            --bg-elevated: #4b582b;
+            --text-primary: #fefae0;
+            --text-secondary: #dda15e;
+            --border-subtle: #bc6c25;
+            --accent-primary: #dda15e;
+            --accent-hover: #bc6c25;
+            --status-alert: #e63946;
         }
 
         * {
@@ -34,7 +82,7 @@
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-base);
             color: var(--text-primary);
             font-family: var(--font-sans);
             min-height: 100vh;
@@ -50,8 +98,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--panel-border);
-            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-surface);
             transition: padding 0.3s ease;
         }
 
@@ -70,8 +118,8 @@
             font-weight: 500;
             padding: 4px 10px;
             border-radius: 4px;
-            background: var(--bg-color);
-            border: 1px solid var(--panel-border);
+            background: var(--bg-base);
+            border: 1px solid var(--border-subtle);
             color: var(--text-secondary);
             white-space: nowrap;
         }
@@ -97,8 +145,8 @@
 
         /* Handcrafted Flat Panels */
         .panel {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
             border-radius: 8px;
             padding: 32px;
             display: flex;
@@ -118,8 +166,8 @@
 
         /* Password Display */
         .password-workspace {
-            background: var(--bg-color);
-            border: 1px solid var(--panel-border);
+            background: var(--bg-base);
+            border: 1px solid var(--border-subtle);
             border-radius: 6px;
             padding: 24px;
             display: flex;
@@ -173,19 +221,19 @@
             display: flex;
             align-items: center;
             gap: 16px;
-            background: var(--bg-color);
-            border: 1px solid var(--panel-border);
+            background: var(--bg-base);
+            border: 1px solid var(--border-subtle);
             border-radius: 6px;
             padding: 12px 16px;
         }
 
         .slider-wrapper input[type="range"] {
             flex-grow: 1;
-            accent-color: var(--accent);
+            accent-color: var(--accent-primary);
             cursor: pointer;
             height: 4px;
             border-radius: 2px;
-            background: var(--panel-border);
+            background: var(--border-subtle);
         }
 
         .slider-value {
@@ -208,8 +256,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--bg-color);
-            border: 1px solid var(--panel-border);
+            background: var(--bg-base);
+            border: 1px solid var(--border-subtle);
             border-radius: 6px;
             padding: 12px 16px;
             cursor: pointer;
@@ -218,11 +266,11 @@
         }
 
         .checkbox-container:hover {
-            border-color: var(--text-muted);
+            border-color: var(--text-secondary);
         }
 
         .checkbox-container input {
-            accent-color: var(--accent);
+            accent-color: var(--accent-primary);
             width: 16px;
             height: 16px;
             cursor: pointer;
@@ -251,7 +299,7 @@
         }
 
         .strength-segment {
-            background: var(--panel-border);
+            background: var(--border-subtle);
             border-radius: 1px;
             transition: background-color 0.3s ease;
         }
@@ -266,8 +314,8 @@
 
         /* Inputs & Controls */
         input[type="password"], input[type="text"], select {
-            background: var(--bg-color);
-            border: 1px solid var(--panel-border);
+            background: var(--bg-base);
+            border: 1px solid var(--border-subtle);
             border-radius: 6px;
             padding: 12px 14px;
             color: var(--text-primary);
@@ -277,7 +325,7 @@
         }
 
         input[type="password"]:focus, input[type="text"]:focus, select:focus {
-            border-color: var(--accent);
+            border-color: var(--accent-primary);
         }
 
         .action-row {
@@ -287,7 +335,7 @@
         }
 
         button {
-            background: var(--accent);
+            background: var(--accent-primary);
             color: #ffffff;
             font-family: var(--font-sans);
             font-weight: 600;
@@ -309,13 +357,13 @@
         }
 
         button.btn-secondary {
-            background: var(--bg-color);
+            background: var(--bg-base);
             color: var(--text-primary);
-            border: 1px solid var(--panel-border);
+            border: 1px solid var(--border-subtle);
         }
 
         button.btn-secondary:hover {
-            background: var(--panel-bg);
+            background: var(--bg-surface);
             border-color: var(--text-secondary);
         }
 
@@ -337,10 +385,10 @@
             flex-direction: column;
             gap: 12px;
             margin-bottom: 20px;
-            background: var(--bg-color);
+            background: var(--bg-base);
             padding: 16px;
             border-radius: 6px;
-            border: 1px solid var(--panel-border);
+            border: 1px solid var(--border-subtle);
         }
 
         .save-form-stacked .input-row-three {
@@ -357,7 +405,7 @@
         }
 
         .vault-link:hover {
-            color: var(--accent);
+            color: var(--accent-primary);
             text-decoration: underline;
         }
 
@@ -398,13 +446,13 @@
             background: transparent;
         }
         .vault-list::-webkit-scrollbar-thumb {
-            background: var(--panel-border);
+            background: var(--border-subtle);
             border-radius: 2px;
         }
 
         .vault-item {
-            background: var(--bg-color);
-            border: 1px solid var(--panel-border);
+            background: var(--bg-base);
+            border: 1px solid var(--border-subtle);
             border-radius: 6px;
             padding: 16px;
             display: flex;
@@ -426,8 +474,8 @@
         }
 
         .vault-password-field {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
             border-radius: 4px;
             padding: 8px 12px;
             font-family: var(--font-mono);
@@ -476,7 +524,7 @@
         }
 
         .error-msg {
-            color: var(--danger);
+            color: var(--status-alert);
             font-size: 12px;
             margin-top: 8px;
             text-align: center;
@@ -496,8 +544,8 @@
         }
 
         .toast {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
             color: var(--text-primary);
             padding: 12px 24px;
             border-radius: 6px;
@@ -512,7 +560,7 @@
         }
 
         .toast.toast-error {
-            border-color: var(--danger);
+            border-color: var(--status-alert);
         }
 
         /* Modal Structure */
@@ -538,8 +586,8 @@
         }
 
         .modal {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
             border-radius: 8px;
             padding: 24px;
             width: 90%;
@@ -581,9 +629,9 @@
             padding: 20px 48px;
             text-align: center;
             font-size: 11px;
-            color: var(--text-muted);
-            border-top: 1px solid var(--panel-border);
-            background: var(--panel-bg);
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-surface);
         }
 
         /* ------------------ RESPONSIVE BREAKPOINTS ------------------ */
@@ -679,7 +727,7 @@
             .vault-item-actions {
                 width: 100%;
                 justify-content: flex-end;
-                border-top: 1px solid var(--panel-border);
+                border-top: 1px solid var(--border-subtle);
                 padding-top: 8px;
             }
             footer {
@@ -709,8 +757,17 @@
         </svg>
         LockBox
     </div>
-    <div class="status-badge" id="app-status-badge">
-        Vault Locked
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <select id="theme-selector" onchange="changeTheme()" style="background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 4px; padding: 4px 8px; font-size: 12px; font-family: var(--font-sans); cursor: pointer; outline: none;">
+            <option value="deep-slate">Deep Slate Dark</option>
+            <option value="paper-light">Paper Light</option>
+            <option value="tactical-amber">Tactical Amber</option>
+            <option value="industrial-steel">Industrial Steel</option>
+            <option value="organic-earth">Organic Earth</option>
+        </select>
+        <div class="status-badge" id="app-status-badge">
+            Vault Locked
+        </div>
     </div>
 </header>
 
@@ -1646,9 +1703,31 @@
         );
     }
 
+
     function escapeJS(str) {
         return str.replace(/'/g, "\\'");
     }
+
+    function changeTheme() {
+        const themeSelect = document.getElementById('theme-selector');
+        if(!themeSelect) return;
+        const theme = themeSelect.value;
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('lockbox_theme', theme);
+    }
+
+    // Load saved theme
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('lockbox_theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const themeSelect = document.getElementById('theme-selector');
+            if (themeSelect) {
+                themeSelect.value = savedTheme;
+            }
+        }
+    });
+
 </script>
 </body>
 </html>
