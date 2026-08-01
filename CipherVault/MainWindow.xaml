@@ -23,6 +23,7 @@
         <SolidColorBrush x:Key="TextPrimaryBrush" Color="#0F172A"/>
         <SolidColorBrush x:Key="TextMutedBrush" Color="#64748B"/>
         <SolidColorBrush x:Key="DestructiveBrush" Color="#DC2626"/>
+        <SolidColorBrush x:Key="HoverBrush" Color="#F1F5F9"/>
 
         <!-- Base Styles -->
         <Style TargetType="TextBlock" x:Key="BaseText">
@@ -38,6 +39,11 @@
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
+        <Style TargetType="TextBlock" x:Key="IconText">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
 
         <!-- Monospace TextBox -->
         <Style TargetType="TextBox" x:Key="MonoInput">
@@ -45,7 +51,7 @@
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Background" Value="#F1F5F9"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Padding" Value="12,10,40,10"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -66,7 +72,10 @@
                         <Grid Background="Transparent">
                             <Border x:Name="BgBorder" CornerRadius="6" Background="Transparent" Margin="8,4"/>
                             <Border x:Name="ActiveIndicator" Width="4" HorizontalAlignment="Left" Background="Transparent" CornerRadius="0,4,4,0"/>
-                            <ContentPresenter Margin="24,12"/>
+                            <StackPanel Orientation="Horizontal" Margin="24,12">
+                                <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource IconText}" Margin="0,0,12,0"/>
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </StackPanel>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
@@ -77,6 +86,9 @@
                             </Trigger>
                             <Trigger Property="IsChecked" Value="False">
                                 <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BgBorder" Property="Background" Value="#F1F5F9"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -118,6 +130,11 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource HoverBrush}"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <!-- Action Button (Icon) -->
@@ -128,9 +145,36 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" Padding="8" CornerRadius="4">
+                        <Border x:Name="BgBorder" Background="{TemplateBinding Background}" Padding="8" CornerRadius="4">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BgBorder" Property="Background" Value="#E2E8F0"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="Button" x:Key="InputIconBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="BgBorder" Background="{TemplateBinding Background}" Padding="6" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BgBorder" Property="Background" Value="#E2E8F0"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -161,10 +205,10 @@
 
                 <!-- Navigation -->
                 <StackPanel Grid.Row="1">
-                    <RadioButton Content="Vault" IsChecked="True" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
-                    <RadioButton Content="Favorites" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
-                    <RadioButton Content="Security Audit" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
-                    <RadioButton Content="Settings" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
+                    <RadioButton Content="Vault" Tag="&#xE8F1;" IsChecked="True" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
+                    <RadioButton Content="Favorites" Tag="&#xE734;" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
+                    <RadioButton Content="Security Audit" Tag="&#xEA18;" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
+                    <RadioButton Content="Settings" Tag="&#xE713;" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
                 </StackPanel>
 
                 <!-- Bottom Sidebar -->
@@ -178,7 +222,6 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Border Width="36" Height="36" CornerRadius="18" Background="#E2E8F0" Margin="0,0,12,0">
-                            <!-- Mock Avatar Placeholder -->
                             <TextBlock Text="AC" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" FontWeight="SemiBold"/>
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -194,10 +237,11 @@
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="64"/>
+                <RowDefinition Height="64"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Top Header & Breadcrumb -->
+            <!-- Top Header Bar -->
             <Border Grid.Row="0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Background="{StaticResource CardBrush}">
                 <Grid Margin="24,0">
                     <Grid.ColumnDefinitions>
@@ -205,39 +249,70 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Breadcrumb / Header Title -->
+                    <!-- Global Search -->
+                    <Border Background="#F1F5F9" CornerRadius="16" Height="32" Padding="12,0" HorizontalAlignment="Left" Width="300">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE11A;" Style="{StaticResource IconText}" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,8,0" FontSize="14"/>
+                                <TextBlock Text="Search vault items..." Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center" IsHitTestVisible="False">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=SearchBox, Path=Text.Length}" Value="0">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                            <Setter Property="Visibility" Value="Hidden"/>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                            <TextBox x:Name="SearchBox" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Padding="22,0,0,0" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Top Utilities -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Style="{StaticResource ActionBtn}" Margin="0,0,4,0">
+                            <TextBlock Text="&#xE117;" Style="{StaticResource IconText}"/>
+                        </Button>
+                        <Button Style="{StaticResource ActionBtn}" Margin="0,0,4,0">
+                            <TextBlock Text="&#xE897;" Style="{StaticResource IconText}"/>
+                        </Button>
+                        <Button Style="{StaticResource ActionBtn}" Margin="0,0,0,0">
+                            <TextBlock Text="&#xE77B;" Style="{StaticResource IconText}"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Sub-Header Breadcrumb & Actions -->
+            <Border Grid.Row="1" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Background="#F8FAFC">
+                <Grid Margin="24,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Breadcrumb -->
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="Vault" Style="{StaticResource LabelText}" FontSize="14" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,8,0"/>
                         <TextBlock Text="&gt;" Style="{StaticResource LabelText}" FontSize="14" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,8,0"/>
-                        <TextBlock Text="{Binding SelectedVaultItem.Title}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="16"/>
-                        <TextBlock Text=" - " Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="16"/>
-                        <TextBlock Text="{Binding SelectedVaultItem.Category}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Text="{Binding SelectedVaultItem.Title}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="14"/>
+                        <TextBlock Text=" - " Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="14"/>
+                        <TextBlock Text="{Binding SelectedVaultItem.Category}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="14"/>
                     </StackPanel>
 
-                    <!-- Top Utilities & Search -->
+                    <!-- Actions -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- Search Box -->
-                        <Border Background="#F1F5F9" CornerRadius="16" Height="32" Padding="12,0" Margin="0,0,16,0" Width="200">
-                            <Grid>
-                                <TextBlock Text="Search vault items..." Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center" IsHitTestVisible="False" Margin="24,0,0,0"/>
-                                <TextBox Background="Transparent" BorderThickness="0" VerticalAlignment="Center" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Padding="24,0,0,0"/>
-                            </Grid>
-                        </Border>
-
-                        <!-- Header Utils -->
-                        <Button Content="🔄" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
-                        <Button Content="❓" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
-                        <Button Content="👤" Style="{StaticResource ActionBtn}" Margin="0,0,16,0"/>
-
-                        <!-- Actions -->
-                        <Button Content="Edit" Style="{StaticResource OutlineBtn}" Margin="0,0,8,0" Command="{Binding EditItemCommand}"/>
+                        <Button Content="Edit" Style="{StaticResource OutlineBtn}" Margin="0,0,12,0" Command="{Binding EditItemCommand}"/>
                         <Button Content="Delete" Style="{StaticResource OutlineBtn}" Foreground="{StaticResource DestructiveBrush}" BorderBrush="{StaticResource DestructiveBrush}" Command="{Binding DeleteItemCommand}"/>
                     </StackPanel>
                 </Grid>
             </Border>
 
             <!-- Vault Entry Detail Workspace (Two Columns) -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
                 <Grid Margin="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*"/>
@@ -254,10 +329,10 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Border Width="64" Height="64" CornerRadius="12" Background="#F1F5F9" Margin="0,0,16,0">
-                                    <TextBlock Text="GH" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}"/>
+                                    <TextBlock Text="&#xE14B;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32" Foreground="{StaticResource TextPrimaryBrush}"/>
                                 </Border>
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding SelectedVaultItem.Title}" Style="{StaticResource HeadingText}" FontSize="24" Margin="0,0,0,4"/>
+                                    <TextBlock Text="{Binding SelectedVaultItem.Title}" Style="{StaticResource HeadingText}" FontSize="20" Margin="0,0,0,4"/>
                                     <TextBlock Text="{Binding SelectedVaultItem.Subtitle}" Style="{StaticResource BaseText}" Foreground="{StaticResource TextMutedBrush}"/>
 
                                     <!-- Badges -->
@@ -269,8 +344,8 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Background="#F1F5F9" CornerRadius="4" Padding="8,4" Margin="0,0,8,0">
-                                                    <TextBlock Text="{Binding}" Style="{StaticResource LabelText}" FontSize="10"/>
+                                                <Border Background="#F1F5F9" CornerRadius="12" Padding="12,4" Margin="0,0,8,0">
+                                                    <TextBlock Text="{Binding}" Style="{StaticResource LabelText}" FontSize="11" Foreground="{StaticResource TextPrimaryBrush}"/>
                                                 </Border>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -283,19 +358,21 @@
                         <Border Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="24">
                             <StackPanel>
                                 <!-- Username Field -->
-                                <StackPanel Margin="0,0,0,20">
+                                <StackPanel Margin="0,0,0,24">
                                     <TextBlock Text="USERNAME / EMAIL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
-                                        <TextBox Text="{Binding SelectedVaultItem.Username}"  IsReadOnly="True"/>
-                                        <Button Content="Copy" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.Username}"/>
+                                        <TextBox Text="{Binding SelectedVaultItem.Username}" IsReadOnly="True" Style="{StaticResource MonoInput}"/>
+                                        <Button Style="{StaticResource InputIconBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.Username}" ToolTip="Copy Username">
+                                            <TextBlock Text="&#xE8C8;" Style="{StaticResource IconText}"/>
+                                        </Button>
                                     </Grid>
                                 </StackPanel>
 
                                 <!-- Password Field -->
-                                <StackPanel Margin="0,0,0,8">
+                                <StackPanel Margin="0,0,0,12">
                                     <TextBlock Text="PASSWORD" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
-                                        <TextBox  IsReadOnly="True" x:Name="PasswordBox">
+                                        <TextBox IsReadOnly="True" Padding="12,10,70,10">
                                             <TextBox.Style>
                                                 <Style TargetType="TextBox" BasedOn="{StaticResource MonoInput}">
                                                     <Setter Property="Text" Value="••••••••••••••••••••"/>
@@ -308,8 +385,23 @@
                                             </TextBox.Style>
                                         </TextBox>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
-                                            <Button Content="Show" Style="{StaticResource ActionBtn}" Command="{Binding TogglePasswordVisibilityCommand}"/>
-                                            <Button Content="Copy" Style="{StaticResource ActionBtn}" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.EncryptedPassword}"/>
+                                            <Button Style="{StaticResource InputIconBtn}" Command="{Binding TogglePasswordVisibilityCommand}" ToolTip="Toggle Visibility">
+                                                <TextBlock>
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock" BasedOn="{StaticResource IconText}">
+                                                            <Setter Property="Text" Value="&#xE890;"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
+                                                                    <Setter Property="Text" Value="&#xE18B;"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Button>
+                                            <Button Style="{StaticResource InputIconBtn}" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.EncryptedPassword}" ToolTip="Copy Password">
+                                                <TextBlock Text="&#xE8C8;" Style="{StaticResource IconText}"/>
+                                            </Button>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
@@ -320,30 +412,43 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Border Width="40" Height="4" CornerRadius="2" Background="{StaticResource PrimaryBrush}" Margin="0,0,4,0"/>
-                                        <Border Width="40" Height="4" CornerRadius="2" Background="{StaticResource PrimaryBrush}" Margin="0,0,4,0"/>
-                                        <Border Width="40" Height="4" CornerRadius="2" Background="{StaticResource PrimaryBrush}" Margin="0,0,4,0"/>
-                                        <Border Width="40" Height="4" CornerRadius="2" Background="{StaticResource PrimaryBrush}" Margin="0,0,4,0"/>
-                                        <Border Width="40" Height="4" CornerRadius="2" Background="{StaticResource PrimaryBrush}"/>
-                                    </StackPanel>
-                                    <TextBlock Grid.Column="1" Text="EXCELLENT (98/100)" Style="{StaticResource LabelText}" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="4"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="4"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="4"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="4"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0" Height="4" CornerRadius="2" Background="{StaticResource PrimaryBrush}"/>
+                                        <Border Grid.Column="2" Height="4" CornerRadius="2" Background="{StaticResource PrimaryBrush}"/>
+                                        <Border Grid.Column="4" Height="4" CornerRadius="2" Background="{StaticResource PrimaryBrush}"/>
+                                        <Border Grid.Column="6" Height="4" CornerRadius="2" Background="{StaticResource PrimaryBrush}"/>
+                                        <Border Grid.Column="8" Height="4" CornerRadius="2" Background="{StaticResource PrimaryBrush}"/>
+                                    </Grid>
+                                    <TextBlock Grid.Column="1" Text="EXCELLENT (98/100)" Style="{StaticResource LabelText}" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center" Margin="16,0,0,0"/>
                                 </Grid>
 
                                 <!-- Website URL Field -->
-                                <StackPanel Margin="0,0,0,24">
-                                    <TextBlock Text="WEBSITE / URL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
+                                <StackPanel Margin="0,0,0,32">
+                                    <TextBlock Text="WEBSITE URL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
-                                        <TextBox Text="{Binding SelectedVaultItem.Url}"  IsReadOnly="True"/>
-                                        <Button Content="Open" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding LaunchExternalUrlCommand}" CommandParameter="{Binding SelectedVaultItem.Url}"/>
+                                        <TextBox Text="{Binding SelectedVaultItem.Url}" IsReadOnly="True" Style="{StaticResource MonoInput}"/>
+                                        <Button Style="{StaticResource InputIconBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding LaunchExternalUrlCommand}" CommandParameter="{Binding SelectedVaultItem.Url}" ToolTip="Open in Browser">
+                                            <TextBlock Text="&#xE8A7;" Style="{StaticResource IconText}"/>
+                                        </Button>
                                     </Grid>
                                 </StackPanel>
 
                                 <!-- Notes Block -->
                                 <StackPanel>
                                     <TextBlock Text="SECURE NOTES" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
-                                    <Border Background="#F1F5F9" CornerRadius="6" Padding="16">
-                                        <TextBlock Text="{Binding SelectedVaultItem.Notes}" Style="{StaticResource BaseText}" TextWrapping="Wrap"/>
+                                    <Border Background="#F1F5F9" CornerRadius="6" Padding="16" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}">
+                                        <TextBlock Text="{Binding SelectedVaultItem.Notes}" Style="{StaticResource BaseText}" TextWrapping="Wrap" LineHeight="20"/>
                                     </Border>
                                 </StackPanel>
                             </StackPanel>
@@ -355,29 +460,33 @@
                         <!-- Security Insights -->
                         <Border Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="20" Margin="0,0,0,24">
                             <StackPanel>
-                                <TextBlock Text="SECURITY INSIGHTS" Style="{StaticResource LabelText}" Margin="0,0,0,16"/>
+                                <TextBlock Text="SECURITY INSIGHTS" Style="{StaticResource LabelText}" Margin="0,0,0,20"/>
 
-                                <Grid Margin="0,0,0,12">
+                                <Grid Margin="0,0,0,16">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="🛡" FontSize="16" Margin="0,0,12,0"/>
-                                    <StackPanel Grid.Column="1">
+                                    <Border Width="32" Height="32" CornerRadius="6" Background="#F1F5F9" Margin="0,0,12,0">
+                                        <TextBlock Text="&#xEA18;" Style="{StaticResource IconText}" HorizontalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="MFA Enabled" Style="{StaticResource BaseText}" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding SelectedVaultItem.MfaStatus}" Style="{StaticResource LabelText}" FontWeight="Normal"/>
+                                        <TextBlock Text="{Binding SelectedVaultItem.MfaStatus}" Style="{StaticResource LabelText}" FontWeight="Normal" Margin="0,2,0,0"/>
                                     </StackPanel>
                                 </Grid>
 
-                                <Grid Margin="0,0,0,12">
+                                <Grid Margin="0,0,0,16">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="📅" FontSize="16" Margin="0,0,12,0"/>
-                                    <StackPanel Grid.Column="1">
+                                    <Border Width="32" Height="32" CornerRadius="6" Background="#F1F5F9" Margin="0,0,12,0">
+                                        <TextBlock Text="&#xE787;" Style="{StaticResource IconText}" HorizontalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="Last Rotated" Style="{StaticResource BaseText}" FontWeight="SemiBold"/>
-                                        <TextBlock Text="12 days ago" Style="{StaticResource LabelText}" FontWeight="Normal"/>
+                                        <TextBlock Text="12 days ago" Style="{StaticResource LabelText}" FontWeight="Normal" Margin="0,2,0,0"/>
                                     </StackPanel>
                                 </Grid>
 
@@ -386,10 +495,12 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="✓" FontSize="16" Margin="0,0,12,0" Foreground="{StaticResource PrimaryBrush}"/>
-                                    <StackPanel Grid.Column="1">
+                                    <Border Width="32" Height="32" CornerRadius="6" Background="#F1F5F9" Margin="0,0,12,0">
+                                        <TextBlock Text="&#xE81C;" Style="{StaticResource IconText}" HorizontalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="Breach Status" Style="{StaticResource BaseText}" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding SelectedVaultItem.BreachStatus}" Style="{StaticResource LabelText}" FontWeight="Normal"/>
+                                        <TextBlock Text="{Binding SelectedVaultItem.BreachStatus}" Style="{StaticResource LabelText}" FontWeight="Normal" Margin="0,2,0,0"/>
                                     </StackPanel>
                                 </Grid>
                             </StackPanel>
@@ -398,30 +509,55 @@
                         <!-- Security History -->
                         <Border Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="20">
                             <StackPanel>
-                                <TextBlock Text="SECURITY HISTORY" Style="{StaticResource LabelText}" Margin="0,0,0,16"/>
+                                <TextBlock Text="SECURITY HISTORY" Style="{StaticResource LabelText}" Margin="0,0,0,20"/>
 
-                                <ItemsControl ItemsSource="{Binding SelectedVaultItem.AuditLogs}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Margin="0,0,0,16">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-                                                <!-- Icon Badge -->
-                                                <Border Width="24" Height="24" CornerRadius="12" Background="#F1F5F9" Margin="0,0,12,0" VerticalAlignment="Top">
-                                                    <TextBlock Text="•" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}"/>
-                                                </Border>
-                                                <StackPanel Grid.Column="1">
-                                                    <TextBlock Text="{Binding ActionType}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="13"/>
-                                                    <TextBlock Text="{Binding Timestamp, StringFormat='g'}" Style="{StaticResource LabelText}" FontWeight="Normal" FontSize="11" Margin="0,2,0,0"/>
-                                                </StackPanel>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                <Grid>
+                                    <!-- Vertical Timeline Line -->
+                                    <Border Width="2" Background="#E2E8F0" HorizontalAlignment="Left" Margin="15,0,0,0" CornerRadius="1"/>
 
-                                <TextBlock Text="View full audit trail" Foreground="{StaticResource PrimaryBrush}" Style="{StaticResource BaseText}" FontSize="13" Margin="0,8,0,0" Cursor="Hand"/>
+                                    <ItemsControl ItemsSource="{Binding SelectedVaultItem.AuditLogs}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,0,0,20">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <!-- Icon Badge -->
+                                                    <Border Width="32" Height="32" CornerRadius="16" Background="#EFF6FF" BorderBrush="{StaticResource CardBrush}" BorderThickness="2" Margin="0,0,12,0" VerticalAlignment="Top">
+                                                        <TextBlock Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock" BasedOn="{StaticResource IconText}">
+                                                                    <Setter Property="Text" Value="&#xE9CE;"/> <!-- Default icon -->
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IconType}" Value="Pencil">
+                                                                            <Setter Property="Text" Value="&#xE70F;"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding IconType}" Value="Eye">
+                                                                            <Setter Property="Text" Value="&#xE890;"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding IconType}" Value="Copy">
+                                                                            <Setter Property="Text" Value="&#xE8C8;"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding IconType}" Value="Plus">
+                                                                            <Setter Property="Text" Value="&#xE710;"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Border>
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding ActionType}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="13"/>
+                                                        <TextBlock Text="{Binding Timestamp, StringFormat='MMM dd, yyyy - HH:mm'}" Style="{StaticResource LabelText}" FontWeight="Normal" FontSize="11" Margin="0,2,0,0"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+
+                                <TextBlock Text="View full audit trail" Foreground="{StaticResource PrimaryBrush}" Style="{StaticResource BaseText}" FontWeight="Medium" FontSize="13" Margin="0,8,0,0" Cursor="Hand" HorizontalAlignment="Left"/>
                             </StackPanel>
                         </Border>
 
