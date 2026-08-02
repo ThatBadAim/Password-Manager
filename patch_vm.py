@@ -1,16 +1,13 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using System.Collections.ObjectModel;
-using CipherVault.Models;
-using System;
-using System.Diagnostics;
-using System.Windows;
-using System.Threading.Tasks;
-using System.Linq;
+import re
 
-namespace CipherVault.ViewModels
-{
-    public partial class MainViewModel : ObservableObject
+with open("CipherVault/ViewModels/MainViewModel.cs", "r") as f:
+    content = f.read()
+
+# Add using System.Threading.Tasks; and System.Linq;
+content = content.replace("using System.Windows;", "using System.Windows;\nusing System.Threading.Tasks;\nusing System.Linq;")
+
+# We will completely replace the class content
+class_content = """    public partial class MainViewModel : ObservableObject
     {
         [ObservableProperty]
         private ObservableCollection<VaultItem> _vaultItems = new();
@@ -54,7 +51,7 @@ namespace CipherVault.ViewModels
                 Username = "alex.chen.dev",
                 EncryptedPassword = "super_secure_password_123", // In real app, this is actual encrypted payload
                 Url = "https://github.com/login",
-                Notes = "Use this account for personal open source contributions.\n\nAssociated email: alex.c@example.com\nRecovery codes are stored in offline physical safe.",
+                Notes = "Use this account for personal open source contributions.\\n\\nAssociated email: alex.c@example.com\\nRecovery codes are stored in offline physical safe.",
                 Badges = new System.Collections.Generic.List<string> { "WORK", "DEVELOPMENT" },
                 SecurityScore = 98,
                 MfaEnabled = true,
@@ -94,35 +91,21 @@ namespace CipherVault.ViewModels
             }
         }
 
-        private System.Threading.CancellationTokenSource? _toastCts;
-
-        private async Task ShowToastAsync(string message)
+        private async void ShowToast(string message)
         {
-            _toastCts?.Cancel();
-            _toastCts = new System.Threading.CancellationTokenSource();
-            var token = _toastCts.Token;
-
             ToastMessage = message;
             IsToastVisible = true;
-
-            try
-            {
-                await Task.Delay(3000, token);
-                if (!token.IsCancellationRequested)
-                {
-                    IsToastVisible = false;
-                }
-            }
-            catch (TaskCanceledException) { }
+            await Task.Delay(3000);
+            IsToastVisible = false;
         }
 
         [RelayCommand]
-        private async Task CopyToClipboardAsync(string text)
+        private void CopyToClipboard(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                await ShowToastAsync("Copied to clipboard!");
+                ShowToast("Copied to clipboard!");
             }
         }
 
@@ -165,5 +148,9 @@ namespace CipherVault.ViewModels
         {
             // Add new item logic
         }
-    }
-}
+    }"""
+
+content = re.sub(r'public partial class MainViewModel : ObservableObject\s*\{.*\}', class_content, content, flags=re.DOTALL)
+
+with open("CipherVault/ViewModels/MainViewModel.cs", "w") as f:
+    f.write(content)
