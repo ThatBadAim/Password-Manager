@@ -19,6 +19,35 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _vaultItems = new();
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _filteredVaultItems = new();
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilteredVaultItems.Clear();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                foreach (var item in VaultItems)
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
+            else
+            {
+                var lowerValue = value.ToLowerInvariant();
+                foreach (var item in VaultItems)
+                {
+                    if (item.Title != null && item.Title.ToLowerInvariant().Contains(lowerValue))
+                    {
+                        FilteredVaultItems.Add(item);
+                    }
+                }
+            }
+        }
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
@@ -45,6 +74,9 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            VaultItems.Add(_selectedVaultItem);
+            FilteredVaultItems.Add(_selectedVaultItem);
         }
 
         [RelayCommand]
