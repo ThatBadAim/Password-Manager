@@ -5,6 +5,7 @@ using CipherVault.Models;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Threading.Tasks;
 
 namespace CipherVault.ViewModels
 {
@@ -18,6 +19,12 @@ namespace CipherVault.ViewModels
 
         [ObservableProperty]
         private string _searchText = string.Empty;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
+        [ObservableProperty]
+        private bool _isToastVisible;
 
         public MainViewModel()
         {
@@ -53,8 +60,17 @@ namespace CipherVault.ViewModels
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                Debug.WriteLine($"Copied to clipboard: {text}");
+                ShowToast("Copied to clipboard");
             }
+        }
+
+        private async void ShowToast(string message)
+        {
+            ToastMessage = message;
+            IsToastVisible = true;
+            await Task.Delay(2500); // 2.5 seconds
+            IsToastVisible = false;
         }
 
         [RelayCommand]
