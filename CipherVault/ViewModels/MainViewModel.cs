@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using CipherVault.Models;
 using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace CipherVault.ViewModels
@@ -19,10 +21,25 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private bool _isSearchOpen;
+
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _allVaultItems = new();
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _filteredVaultItems = new();
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var mockItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,15 +62,40 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            AllVaultItems.Add(mockItem);
+            FilteredVaultItems = new ObservableCollection<VaultItem>(AllVaultItems);
+            _selectedVaultItem = mockItem;
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                FilteredVaultItems = new ObservableCollection<VaultItem>(AllVaultItems);
+                IsSearchOpen = false;
+            }
+            else
+            {
+                FilteredVaultItems = new ObservableCollection<VaultItem>(
+                    AllVaultItems.Where(i => i.Title.Contains(value, StringComparison.OrdinalIgnoreCase) ||
+                                             i.Subtitle.Contains(value, StringComparison.OrdinalIgnoreCase) ||
+                                             i.Category.Contains(value, StringComparison.OrdinalIgnoreCase))
+                );
+                IsSearchOpen = FilteredVaultItems.Any();
+            }
         }
 
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async Task CopyToClipboardAsync(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                ToastMessage = "Copied to clipboard";
+                IsToastVisible = true;
+                await Task.Delay(2000);
+                IsToastVisible = false;
             }
         }
 
@@ -80,21 +122,41 @@ namespace CipherVault.ViewModels
         }
 
         [RelayCommand]
-        private void EditItem()
+        private async Task EditItemAsync()
         {
-            // Edit item logic
+            ToastMessage = "Edit Feature Coming Soon";
+            IsToastVisible = true;
+            await Task.Delay(2000);
+            IsToastVisible = false;
         }
 
         [RelayCommand]
-        private void DeleteItem()
+        private async Task DeleteItemAsync()
         {
-            // Delete item logic
+            ToastMessage = "Delete Feature Coming Soon";
+            IsToastVisible = true;
+            await Task.Delay(2000);
+            IsToastVisible = false;
         }
 
         [RelayCommand]
-        private void AddNewItem()
+        private async Task AddNewItemAsync()
         {
-            // Add new item logic
+            ToastMessage = "Add Item Feature Coming Soon";
+            IsToastVisible = true;
+            await Task.Delay(2000);
+            IsToastVisible = false;
+        }
+
+        [RelayCommand]
+        private void SelectVaultItem(VaultItem item)
+        {
+            if (item != null)
+            {
+                SelectedVaultItem = item;
+                SearchText = string.Empty;
+                IsSearchOpen = false;
+            }
         }
     }
 }
