@@ -5,6 +5,7 @@ using CipherVault.Models;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Threading.Tasks;
 
 namespace CipherVault.ViewModels
 {
@@ -16,8 +17,24 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private bool _isPasswordVisible;
 
-        [ObservableProperty]
         private string _searchText = string.Empty;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (SetProperty(ref _searchText, value))
+                {
+                    OnSearchTextChanged(value);
+                }
+            }
+        }
+
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
 
         public MainViewModel()
         {
@@ -39,21 +56,31 @@ namespace CipherVault.ViewModels
                 BreachStatus = "No leaks detected",
                 AuditLogs = new System.Collections.Generic.List<AuditLogEntry>
                 {
-                    new AuditLogEntry { Timestamp = DateTime.Now.AddMinutes(-5), ActionType = "Password Updated", ActionDescription = "Password changed via settings", IconType = "Pencil" },
-                    new AuditLogEntry { Timestamp = DateTime.Now.AddDays(-2), ActionType = "Password Viewed", ActionDescription = "Password revealed in UI", IconType = "Eye" },
-                    new AuditLogEntry { Timestamp = DateTime.Now.AddDays(-5), ActionType = "Username Copied", ActionDescription = "Username copied to clipboard", IconType = "Copy" },
-                    new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
+                    new AuditLogEntry { Timestamp = DateTime.Now.AddMinutes(-5), ActionType = "Password Updated", ActionDescription = "Password changed via settings", IconType = "\xE70F" },
+                    new AuditLogEntry { Timestamp = DateTime.Now.AddDays(-2), ActionType = "Password Viewed", ActionDescription = "Password revealed in UI", IconType = "\xE890" },
+                    new AuditLogEntry { Timestamp = DateTime.Now.AddDays(-5), ActionType = "Username Copied", ActionDescription = "Username copied to clipboard", IconType = "\xE8C8" },
+                    new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "\xE710" }
                 }
             };
         }
 
+        private void OnSearchTextChanged(string text)
+        {
+            // In a real app with an ObservableCollection, you would filter the collection here.
+            // For now, let's just trace it to demonstrate dynamic search handling.
+            Debug.WriteLine($"Search text changed to: {text}");
+        }
+
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async Task CopyToClipboardAsync(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                ToastMessage = "Copied to clipboard";
+                IsToastVisible = true;
+                await Task.Delay(2000);
+                IsToastVisible = false;
             }
         }
 

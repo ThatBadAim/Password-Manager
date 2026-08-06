@@ -66,7 +66,14 @@
                         <Grid Background="Transparent">
                             <Border x:Name="BgBorder" CornerRadius="6" Background="Transparent" Margin="8,4"/>
                             <Border x:Name="ActiveIndicator" Width="4" HorizontalAlignment="Left" Background="Transparent" CornerRadius="0,4,4,0"/>
-                            <ContentPresenter Margin="24,12"/>
+                            <StackPanel Orientation="Horizontal" Margin="24,12">
+                                <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="16"
+                                           Margin="0,0,12,0"
+                                           VerticalAlignment="Center"/>
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </StackPanel>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
@@ -161,10 +168,10 @@
 
                 <!-- Navigation -->
                 <StackPanel Grid.Row="1">
-                    <RadioButton Content="Vault" IsChecked="True" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
-                    <RadioButton Content="Favorites" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
-                    <RadioButton Content="Security Audit" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
-                    <RadioButton Content="Settings" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
+                    <RadioButton Content="Vault" Tag="&#xE81C;" IsChecked="True" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
+                    <RadioButton Content="Favorites" Tag="&#xE734;" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
+                    <RadioButton Content="Security Audit" Tag="&#xE773;" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
+                    <RadioButton Content="Settings" Tag="&#xE713;" Style="{StaticResource SidebarMenuBtn}" GroupName="Nav"/>
                 </StackPanel>
 
                 <!-- Bottom Sidebar -->
@@ -198,43 +205,57 @@
             </Grid.RowDefinitions>
 
             <!-- Top Header & Breadcrumb -->
-            <Border Grid.Row="0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Background="{StaticResource CardBrush}">
-                <Grid Margin="24,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Breadcrumb / Header Title -->
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="Vault" Style="{StaticResource LabelText}" FontSize="14" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,8,0"/>
-                        <TextBlock Text="&gt;" Style="{StaticResource LabelText}" FontSize="14" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,8,0"/>
-                        <TextBlock Text="{Binding SelectedVaultItem.Title}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="16"/>
-                        <TextBlock Text=" - " Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="16"/>
-                        <TextBlock Text="{Binding SelectedVaultItem.Category}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="16"/>
-                    </StackPanel>
-
-                    <!-- Top Utilities & Search -->
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <!-- Top Utilities & Search -->
+                <Border Grid.Row="0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Background="{StaticResource CardBrush}" Padding="24,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
                         <!-- Search Box -->
-                        <Border Background="#F1F5F9" CornerRadius="16" Height="32" Padding="12,0" Margin="0,0,16,0" Width="200">
+                        <Border Background="#F1F5F9" CornerRadius="16" Height="32" Padding="12,0" Width="300" HorizontalAlignment="Left">
                             <Grid>
+                                <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                 <TextBlock Text="Search vault items..." Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center" IsHitTestVisible="False" Margin="24,0,0,0"/>
                                 <TextBox Background="Transparent" BorderThickness="0" VerticalAlignment="Center" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Padding="24,0,0,0"/>
                             </Grid>
                         </Border>
-
                         <!-- Header Utils -->
-                        <Button Content="🔄" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
-                        <Button Content="❓" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
-                        <Button Content="👤" Style="{StaticResource ActionBtn}" Margin="0,0,16,0"/>
-
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="&#xE895;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
+                            <Button Content="&#xE897;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
+                            <Button Content="&#xE77B;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ActionBtn}" Margin="0,0,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <!-- Sub-Header Breadcrumb -->
+                <Border Grid.Row="1" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Background="{StaticResource CardBrush}" Padding="24,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <!-- Breadcrumb / Header Title -->
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Vault" Style="{StaticResource LabelText}" FontSize="14" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="&gt;" Style="{StaticResource LabelText}" FontSize="14" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding SelectedVaultItem.Title}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="16"/>
+                            <TextBlock Text=" - " Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="16"/>
+                            <TextBlock Text="{Binding SelectedVaultItem.Category}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="16"/>
+                        </StackPanel>
                         <!-- Actions -->
-                        <Button Content="Edit" Style="{StaticResource OutlineBtn}" Margin="0,0,8,0" Command="{Binding EditItemCommand}"/>
-                        <Button Content="Delete" Style="{StaticResource OutlineBtn}" Foreground="{StaticResource DestructiveBrush}" BorderBrush="{StaticResource DestructiveBrush}" Command="{Binding DeleteItemCommand}"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="Edit" Style="{StaticResource OutlineBtn}" Margin="0,0,8,0" Command="{Binding EditItemCommand}"/>
+                            <Button Content="Delete" Style="{StaticResource OutlineBtn}" Foreground="{StaticResource DestructiveBrush}" BorderBrush="{StaticResource DestructiveBrush}" Command="{Binding DeleteItemCommand}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
 
             <!-- Vault Entry Detail Workspace (Two Columns) -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -287,7 +308,7 @@
                                     <TextBlock Text="USERNAME / EMAIL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
                                         <TextBox Text="{Binding SelectedVaultItem.Username}"  IsReadOnly="True"/>
-                                        <Button Content="Copy" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.Username}"/>
+                                        <Button Content="&#xE8C8;" FontFamily="Segoe MDL2 Assets" FontSize="16" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.Username}"/>
                                     </Grid>
                                 </StackPanel>
 
@@ -308,8 +329,8 @@
                                             </TextBox.Style>
                                         </TextBox>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
-                                            <Button Content="Show" Style="{StaticResource ActionBtn}" Command="{Binding TogglePasswordVisibilityCommand}"/>
-                                            <Button Content="Copy" Style="{StaticResource ActionBtn}" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.EncryptedPassword}"/>
+                                            <Button Content="&#xE890;" FontFamily="Segoe MDL2 Assets" FontSize="16" Style="{StaticResource ActionBtn}" Command="{Binding TogglePasswordVisibilityCommand}"/>
+                                            <Button Content="&#xE8C8;" FontFamily="Segoe MDL2 Assets" FontSize="16" Style="{StaticResource ActionBtn}" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.EncryptedPassword}"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
@@ -335,7 +356,7 @@
                                     <TextBlock Text="WEBSITE / URL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
                                         <TextBox Text="{Binding SelectedVaultItem.Url}"  IsReadOnly="True"/>
-                                        <Button Content="Open" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding LaunchExternalUrlCommand}" CommandParameter="{Binding SelectedVaultItem.Url}"/>
+                                        <Button Content="&#xE8A7;" FontFamily="Segoe MDL2 Assets" FontSize="16" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding LaunchExternalUrlCommand}" CommandParameter="{Binding SelectedVaultItem.Url}"/>
                                     </Grid>
                                 </StackPanel>
 
@@ -362,7 +383,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="🛡" FontSize="16" Margin="0,0,12,0"/>
+                                    <TextBlock Text="&#xEA18;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,12,0"/>
                                     <StackPanel Grid.Column="1">
                                         <TextBlock Text="MFA Enabled" Style="{StaticResource BaseText}" FontWeight="SemiBold"/>
                                         <TextBlock Text="{Binding SelectedVaultItem.MfaStatus}" Style="{StaticResource LabelText}" FontWeight="Normal"/>
@@ -374,7 +395,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="📅" FontSize="16" Margin="0,0,12,0"/>
+                                    <TextBlock Text="&#xE787;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,12,0"/>
                                     <StackPanel Grid.Column="1">
                                         <TextBlock Text="Last Rotated" Style="{StaticResource BaseText}" FontWeight="SemiBold"/>
                                         <TextBlock Text="12 days ago" Style="{StaticResource LabelText}" FontWeight="Normal"/>
@@ -386,7 +407,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="✓" FontSize="16" Margin="0,0,12,0" Foreground="{StaticResource PrimaryBrush}"/>
+                                    <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,12,0" Foreground="{StaticResource PrimaryBrush}"/>
                                     <StackPanel Grid.Column="1">
                                         <TextBlock Text="Breach Status" Style="{StaticResource BaseText}" FontWeight="SemiBold"/>
                                         <TextBlock Text="{Binding SelectedVaultItem.BreachStatus}" Style="{StaticResource LabelText}" FontWeight="Normal"/>
@@ -400,26 +421,29 @@
                             <StackPanel>
                                 <TextBlock Text="SECURITY HISTORY" Style="{StaticResource LabelText}" Margin="0,0,0,16"/>
 
-                                <ItemsControl ItemsSource="{Binding SelectedVaultItem.AuditLogs}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Margin="0,0,0,16">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-                                                <!-- Icon Badge -->
-                                                <Border Width="24" Height="24" CornerRadius="12" Background="#F1F5F9" Margin="0,0,12,0" VerticalAlignment="Top">
-                                                    <TextBlock Text="•" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}"/>
-                                                </Border>
-                                                <StackPanel Grid.Column="1">
-                                                    <TextBlock Text="{Binding ActionType}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="13"/>
-                                                    <TextBlock Text="{Binding Timestamp, StringFormat='g'}" Style="{StaticResource LabelText}" FontWeight="Normal" FontSize="11" Margin="0,2,0,0"/>
-                                                </StackPanel>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                <Grid>
+                                    <Rectangle Width="2" Fill="{StaticResource BorderBrush}" HorizontalAlignment="Left" Margin="11,12,0,12"/>
+                                    <ItemsControl ItemsSource="{Binding SelectedVaultItem.AuditLogs}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,0,0,16">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <!-- Icon Badge -->
+                                                    <Border Width="24" Height="24" CornerRadius="12" Background="#F1F5F9" Margin="0,0,12,0" VerticalAlignment="Top">
+                                                        <TextBlock Text="{Binding IconType}" FontFamily="Segoe MDL2 Assets" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource PrimaryBrush}"/>
+                                                    </Border>
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="{Binding ActionType}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="13"/>
+                                                        <TextBlock Text="{Binding Timestamp, StringFormat='g'}" Style="{StaticResource LabelText}" FontWeight="Normal" FontSize="11" Margin="0,2,0,0"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
 
                                 <TextBlock Text="View full audit trail" Foreground="{StaticResource PrimaryBrush}" Style="{StaticResource BaseText}" FontSize="13" Margin="0,8,0,0" Cursor="Hand"/>
                             </StackPanel>
@@ -429,5 +453,14 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
+
+        <!-- Toast Overlay -->
+        <Border Grid.Column="0" Grid.ColumnSpan="2"
+                VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                Margin="0,0,0,32" Padding="16,10"
+                Background="#333333" CornerRadius="6"
+                Visibility="{Binding IsToastVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock Text="{Binding ToastMessage}" Foreground="White" FontSize="14" FontWeight="SemiBold"/>
+        </Border>
     </Grid>
 </Window>
