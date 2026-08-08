@@ -11,7 +11,7 @@ namespace CipherVault.ViewModels
     public partial class MainViewModel : ObservableObject
     {
         [ObservableProperty]
-        private VaultItem _selectedVaultItem;
+        private VaultItem? _selectedVaultItem;
 
         [ObservableProperty]
         private bool _isPasswordVisible;
@@ -19,10 +19,12 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        public ObservableCollection<VaultItem> VaultItems { get; } = new();
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var mockItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,6 +47,23 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            VaultItems.Add(mockItem);
+            _selectedVaultItem = mockItem;
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                SelectedVaultItem = VaultItems.FirstOrDefault();
+            }
+            else
+            {
+                SelectedVaultItem = VaultItems.FirstOrDefault(v =>
+                    v.Title.Contains(value, StringComparison.OrdinalIgnoreCase) ||
+                    v.Username.Contains(value, StringComparison.OrdinalIgnoreCase));
+            }
         }
 
         [RelayCommand]
