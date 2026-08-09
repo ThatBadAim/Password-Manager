@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using CipherVault.Models;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 
 namespace CipherVault.ViewModels
@@ -19,10 +20,35 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _vaultItems = new();
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _filteredVaultItems = new();
+
+        partial void OnSearchTextChanged(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                FilteredVaultItems = new ObservableCollection<VaultItem>(VaultItems);
+            }
+            else
+            {
+                var lowerSearch = value.ToLowerInvariant();
+                FilteredVaultItems = new ObservableCollection<VaultItem>(
+                    VaultItems.Where(i =>
+                        (i.Title?.ToLowerInvariant().Contains(lowerSearch) ?? false) ||
+                        (i.Category?.ToLowerInvariant().Contains(lowerSearch) ?? false) ||
+                        (i.Subtitle?.ToLowerInvariant().Contains(lowerSearch) ?? false)
+                    )
+                );
+            }
+        }
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var mockItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,6 +71,9 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+            _selectedVaultItem = mockItem;
+            VaultItems.Add(mockItem);
+            FilteredVaultItems.Add(mockItem);
         }
 
         [RelayCommand]
