@@ -5,6 +5,7 @@ using CipherVault.Models;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Linq;
 
 namespace CipherVault.ViewModels
 {
@@ -19,10 +20,15 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        private readonly ObservableCollection<VaultItem> _allVaultItems;
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _filteredVaultItems;
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var mockItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,6 +51,26 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            _selectedVaultItem = mockItem;
+            _allVaultItems = new ObservableCollection<VaultItem> { mockItem };
+            _filteredVaultItems = new ObservableCollection<VaultItem>(_allVaultItems);
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                FilteredVaultItems = new ObservableCollection<VaultItem>(_allVaultItems);
+            }
+            else
+            {
+                var lowerSearch = value.ToLowerInvariant();
+                var filtered = _allVaultItems.Where(i =>
+                    i.Title.ToLowerInvariant().Contains(lowerSearch) ||
+                    i.Category.ToLowerInvariant().Contains(lowerSearch));
+                FilteredVaultItems = new ObservableCollection<VaultItem>(filtered);
+            }
         }
 
         [RelayCommand]
@@ -82,19 +108,19 @@ namespace CipherVault.ViewModels
         [RelayCommand]
         private void EditItem()
         {
-            // Edit item logic
+            Debug.WriteLine("EditItem invoked");
         }
 
         [RelayCommand]
         private void DeleteItem()
         {
-            // Delete item logic
+            Debug.WriteLine("DeleteItem invoked");
         }
 
         [RelayCommand]
         private void AddNewItem()
         {
-            // Add new item logic
+            Debug.WriteLine("AddNewItem invoked");
         }
     }
 }
