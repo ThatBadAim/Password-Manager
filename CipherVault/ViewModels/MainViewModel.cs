@@ -5,6 +5,7 @@ using CipherVault.Models;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Linq;
 
 namespace CipherVault.ViewModels
 {
@@ -18,6 +19,9 @@ namespace CipherVault.ViewModels
 
         [ObservableProperty]
         private string _searchText = string.Empty;
+
+        public ObservableCollection<VaultItem> AllVaultItems { get; } = new();
+        public ObservableCollection<VaultItem> FilteredVaultItems { get; } = new();
 
         public MainViewModel()
         {
@@ -45,6 +49,29 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            AllVaultItems.Add(_selectedVaultItem);
+            FilteredVaultItems.Add(_selectedVaultItem);
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilteredVaultItems.Clear();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                foreach (var item in AllVaultItems)
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
+            else
+            {
+                var lowerSearch = value.ToLowerInvariant();
+                foreach (var item in AllVaultItems.Where(i => i.Title.ToLowerInvariant().Contains(lowerSearch) || i.Category.ToLowerInvariant().Contains(lowerSearch)))
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
         }
 
         [RelayCommand]
@@ -95,6 +122,12 @@ namespace CipherVault.ViewModels
         private void AddNewItem()
         {
             // Add new item logic
+        }
+
+        [RelayCommand]
+        private void ViewAuditTrail()
+        {
+            // View audit trail logic
         }
     }
 }
