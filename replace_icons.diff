@@ -1,0 +1,51 @@
+--- CipherVault/MainWindow.xaml
++++ CipherVault/MainWindow.xaml
+@@ -124,6 +124,7 @@
+         <Style TargetType="Button" x:Key="ActionBtn">
+             <Setter Property="Background" Value="Transparent"/>
+             <Setter Property="BorderThickness" Value="0"/>
++            <Setter Property="FontFamily" Value="Segoe MDL2 Assets, Segoe UI, sans-serif"/>
+             <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+             <Setter Property="Template">
+                 <Setter.Value>
+@@ -225,9 +226,9 @@
+                         </Border>
+
+                         <!-- Header Utils -->
+-                        <Button Content="🔄" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
+-                        <Button Content="❓" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
+-                        <Button Content="👤" Style="{StaticResource ActionBtn}" Margin="0,0,16,0"/>
++                        <Button Content="&#xE117;" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
++                        <Button Content="&#xE897;" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
++                        <Button Content="&#xE77B;" Style="{StaticResource ActionBtn}" Margin="0,0,16,0"/>
+
+                         <!-- Actions -->
+                         <Button Content="Edit" Style="{StaticResource OutlineBtn}" Margin="0,0,8,0" Command="{Binding EditItemCommand}"/>
+@@ -287,7 +288,7 @@
+                                     <TextBlock Text="USERNAME / EMAIL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
+                                     <Grid>
+                                         <TextBox Text="{Binding SelectedVaultItem.Username}" Style="{StaticResource MonoInput}" Padding="12,10,70,10" IsReadOnly="True"/>
+-                                        <Button Content="Copy" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.Username}"/>
++                                        <Button Content="&#xE8C8;" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.Username}"/>
+                                     </Grid>
+                                 </StackPanel>
+
+@@ -309,8 +310,8 @@
+                                             </TextBox.Style>
+                                         </TextBox>
+                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
+-                                            <Button Content="Show" Style="{StaticResource ActionBtn}" Command="{Binding TogglePasswordVisibilityCommand}"/>
+-                                            <Button Content="Copy" Style="{StaticResource ActionBtn}" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.EncryptedPassword}"/>
++                                            <Button Content="&#xE890;" Style="{StaticResource ActionBtn}" Command="{Binding TogglePasswordVisibilityCommand}"/>
++                                            <Button Content="&#xE8C8;" Style="{StaticResource ActionBtn}" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.EncryptedPassword}"/>
+                                         </StackPanel>
+                                     </Grid>
+                                 </StackPanel>
+@@ -336,7 +337,7 @@
+                                     <TextBlock Text="WEBSITE / URL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
+                                     <Grid>
+                                         <TextBox Text="{Binding SelectedVaultItem.Url}" Style="{StaticResource MonoInput}" Padding="12,10,70,10" IsReadOnly="True"/>
+-                                        <Button Content="Open" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding LaunchExternalUrlCommand}" CommandParameter="{Binding SelectedVaultItem.Url}"/>
++                                        <Button Content="&#xE8A7;" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding LaunchExternalUrlCommand}" CommandParameter="{Binding SelectedVaultItem.Url}"/>
+                                     </Grid>
+                                 </StackPanel>
