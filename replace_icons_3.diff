@@ -1,0 +1,27 @@
+--- CipherVault/MainWindow.xaml
++++ CipherVault/MainWindow.xaml
+@@ -410,13 +410,23 @@
+                                                     <ColumnDefinition Width="Auto"/>
+                                                     <ColumnDefinition Width="*"/>
+                                                 </Grid.ColumnDefinitions>
+                                                 <!-- Icon Badge -->
+                                                 <Border Width="24" Height="24" CornerRadius="12" Background="#F1F5F9" Margin="0,0,12,0" VerticalAlignment="Top">
+-                                                    <TextBlock Text="•" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}"/>
++                                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" FontFamily="Segoe MDL2 Assets" FontSize="10">
++                                                        <TextBlock.Style>
++                                                            <Style TargetType="TextBlock">
++                                                                <Style.Triggers>
++                                                                    <DataTrigger Binding="{Binding IconType}" Value="Pencil"><Setter Property="Text" Value="&#xE70F;"/></DataTrigger>
++                                                                    <DataTrigger Binding="{Binding IconType}" Value="Eye"><Setter Property="Text" Value="&#xE890;"/></DataTrigger>
++                                                                    <DataTrigger Binding="{Binding IconType}" Value="Copy"><Setter Property="Text" Value="&#xE8C8;"/></DataTrigger>
++                                                                    <DataTrigger Binding="{Binding IconType}" Value="Plus"><Setter Property="Text" Value="&#xE710;"/></DataTrigger>
++                                                                </Style.Triggers>
++                                                            </Style>
++                                                        </TextBlock.Style>
++                                                    </TextBlock>
+                                                 </Border>
+                                                 <StackPanel Grid.Column="1">
+                                                     <TextBlock Text="{Binding ActionType}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="13"/>
+                                                     <TextBlock Text="{Binding Timestamp, StringFormat='g'}" Style="{StaticResource LabelText}" FontWeight="Normal" FontSize="11" Margin="0,2,0,0"/>
+                                                 </StackPanel>
+                                             </Grid>
