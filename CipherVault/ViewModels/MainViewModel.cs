@@ -5,6 +5,7 @@ using CipherVault.Models;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Linq;
 
 namespace CipherVault.ViewModels
 {
@@ -19,10 +20,38 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _vaultItems = new();
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _filteredVaultItems = new();
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilterItems(value);
+        }
+
+        private void FilterItems(string searchText)
+        {
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                FilteredVaultItems = new ObservableCollection<VaultItem>(VaultItems);
+            }
+            else
+            {
+                var lowerSearch = searchText.ToLowerInvariant();
+                var filtered = System.Linq.Enumerable.Where(VaultItems, i =>
+                    i.Title.ToLowerInvariant().Contains(lowerSearch) ||
+                    i.Category.ToLowerInvariant().Contains(lowerSearch) ||
+                    i.Username.ToLowerInvariant().Contains(lowerSearch));
+                FilteredVaultItems = new ObservableCollection<VaultItem>(filtered);
+            }
+        }
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var mockItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,6 +74,10 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            _selectedVaultItem = mockItem;
+            VaultItems.Add(mockItem);
+            FilterItems(string.Empty);
         }
 
         [RelayCommand]
