@@ -286,7 +286,7 @@
                                 <StackPanel Margin="0,0,0,20">
                                     <TextBlock Text="USERNAME / EMAIL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
-                                        <TextBox Text="{Binding SelectedVaultItem.Username}"  IsReadOnly="True"/>
+                                        <TextBox Text="{Binding SelectedVaultItem.Username}" IsReadOnly="True" Style="{StaticResource MonoInput}" Padding="12,10,70,10"/>
                                         <Button Content="Copy" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.Username}"/>
                                     </Grid>
                                 </StackPanel>
@@ -298,6 +298,7 @@
                                         <TextBox  IsReadOnly="True" x:Name="PasswordBox">
                                             <TextBox.Style>
                                                 <Style TargetType="TextBox" BasedOn="{StaticResource MonoInput}">
+                                                    <Setter Property="Padding" Value="12,10,120,10"/>
                                                     <Setter Property="Text" Value="••••••••••••••••••••"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
@@ -334,7 +335,7 @@
                                 <StackPanel Margin="0,0,0,24">
                                     <TextBlock Text="WEBSITE / URL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
-                                        <TextBox Text="{Binding SelectedVaultItem.Url}"  IsReadOnly="True"/>
+                                        <TextBox Text="{Binding SelectedVaultItem.Url}" IsReadOnly="True" Style="{StaticResource MonoInput}" Padding="12,10,70,10"/>
                                         <Button Content="Open" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding LaunchExternalUrlCommand}" CommandParameter="{Binding SelectedVaultItem.Url}"/>
                                     </Grid>
                                 </StackPanel>
