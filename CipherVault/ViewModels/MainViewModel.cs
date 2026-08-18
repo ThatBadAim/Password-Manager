@@ -1,3 +1,4 @@
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -16,13 +17,58 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private bool _isPasswordVisible;
 
-        [ObservableProperty]
         private string _searchText = string.Empty;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                SetProperty(ref _searchText, value);
+                FilterVaultItems();
+            }
+        }
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _filteredVaultItems;
+
+        private ObservableCollection<VaultItem> _allVaultItems;
+
+        private void FilterVaultItems()
+        {
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                FilteredVaultItems = new ObservableCollection<VaultItem>(_allVaultItems);
+            }
+            else
+            {
+                var lowerSearch = SearchText.ToLower();
+                var filtered = _allVaultItems.Where(item =>
+                    item.Title.ToLower().Contains(lowerSearch) ||
+                    item.Username.ToLower().Contains(lowerSearch) ||
+                    item.Url.ToLower().Contains(lowerSearch));
+                FilteredVaultItems = new ObservableCollection<VaultItem>(filtered);
+            }
+        }
+
+
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
+        private async System.Threading.Tasks.Task ShowToast(string message)
+        {
+            ToastMessage = message;
+            IsToastVisible = true;
+            await System.Threading.Tasks.Task.Delay(2000);
+            IsToastVisible = false;
+        }
 
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var mockItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,15 +91,19 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            _selectedVaultItem = mockItem;
+            _allVaultItems = new ObservableCollection<VaultItem> { mockItem };
+            _filteredVaultItems = new ObservableCollection<VaultItem>(_allVaultItems);
         }
 
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async System.Threading.Tasks.Task CopyToClipboard(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                await ShowToast("Copied to clipboard");
             }
         }
 
@@ -80,21 +130,27 @@ namespace CipherVault.ViewModels
         }
 
         [RelayCommand]
-        private void EditItem()
+        private async System.Threading.Tasks.Task EditItem()
         {
-            // Edit item logic
+            await ShowToast("Edit item triggered");
         }
 
         [RelayCommand]
-        private void DeleteItem()
+        private async System.Threading.Tasks.Task DeleteItem()
         {
-            // Delete item logic
+            if (SelectedVaultItem != null)
+            {
+                _allVaultItems.Remove(SelectedVaultItem);
+                FilterVaultItems();
+                SelectedVaultItem = _allVaultItems.FirstOrDefault();
+                await ShowToast("Item deleted");
+            }
         }
 
         [RelayCommand]
-        private void AddNewItem()
+        private async System.Threading.Tasks.Task AddNewItem()
         {
-            // Add new item logic
+            await ShowToast("Add new item triggered");
         }
     }
 }
