@@ -19,6 +19,12 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
@@ -53,7 +59,17 @@ namespace CipherVault.ViewModels
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                ToastMessage = "Copied to clipboard";
+                IsToastVisible = true;
+
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    await System.Threading.Tasks.Task.Delay(2000);
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        IsToastVisible = false;
+                    });
+                });
             }
         }
 
