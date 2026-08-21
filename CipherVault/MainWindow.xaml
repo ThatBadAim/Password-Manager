@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CipherVault"
         xmlns:viewmodels="clr-namespace:CipherVault.ViewModels"
+        xmlns:converters="clr-namespace:CipherVault.Converters"
         mc:Ignorable="d"
         Title="CipherVault" Height="768" Width="1024"
         Background="#F8FAFC"
@@ -15,6 +16,7 @@
     </Window.DataContext>
 
     <Window.Resources>
+        <converters:IconConverter x:Key="IconConverter"/>
         <!-- Colors -->
         <SolidColorBrush x:Key="BgBrush" Color="#F8FAFC"/>
         <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
@@ -225,9 +227,9 @@
                         </Border>
 
                         <!-- Header Utils -->
-                        <Button Content="🔄" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
-                        <Button Content="❓" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
-                        <Button Content="👤" Style="{StaticResource ActionBtn}" Margin="0,0,16,0"/>
+                        <Button Content="&#xE895;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
+                        <Button Content="&#xE897;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ActionBtn}" Margin="0,0,4,0"/>
+                        <Button Content="&#xE77B;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ActionBtn}" Margin="0,0,16,0"/>
 
                         <!-- Actions -->
                         <Button Content="Edit" Style="{StaticResource OutlineBtn}" Margin="0,0,8,0" Command="{Binding EditItemCommand}"/>
@@ -286,8 +288,8 @@
                                 <StackPanel Margin="0,0,0,20">
                                     <TextBlock Text="USERNAME / EMAIL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
-                                        <TextBox Text="{Binding SelectedVaultItem.Username}"  IsReadOnly="True"/>
-                                        <Button Content="Copy" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.Username}"/>
+                                        <TextBox Text="{Binding SelectedVaultItem.Username}" Style="{StaticResource MonoInput}" Padding="12,10,70,10" IsReadOnly="True"/>
+                                        <Button Content="&#xE8C8;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.Username}"/>
                                     </Grid>
                                 </StackPanel>
 
@@ -295,9 +297,10 @@
                                 <StackPanel Margin="0,0,0,8">
                                     <TextBlock Text="PASSWORD" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
-                                        <TextBox  IsReadOnly="True" x:Name="PasswordBox">
+                                        <TextBox IsReadOnly="True" x:Name="PasswordBox">
                                             <TextBox.Style>
                                                 <Style TargetType="TextBox" BasedOn="{StaticResource MonoInput}">
+                                                    <Setter Property="Padding" Value="12,10,70,10"/>
                                                     <Setter Property="Text" Value="••••••••••••••••••••"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
@@ -308,8 +311,8 @@
                                             </TextBox.Style>
                                         </TextBox>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
-                                            <Button Content="Show" Style="{StaticResource ActionBtn}" Command="{Binding TogglePasswordVisibilityCommand}"/>
-                                            <Button Content="Copy" Style="{StaticResource ActionBtn}" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.EncryptedPassword}"/>
+                                            <Button Content="&#xE18B;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ActionBtn}" Command="{Binding TogglePasswordVisibilityCommand}"/>
+                                            <Button Content="&#xE8C8;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ActionBtn}" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.EncryptedPassword}"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
@@ -334,8 +337,8 @@
                                 <StackPanel Margin="0,0,0,24">
                                     <TextBlock Text="WEBSITE / URL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
-                                        <TextBox Text="{Binding SelectedVaultItem.Url}"  IsReadOnly="True"/>
-                                        <Button Content="Open" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding LaunchExternalUrlCommand}" CommandParameter="{Binding SelectedVaultItem.Url}"/>
+                                        <TextBox Text="{Binding SelectedVaultItem.Url}" Style="{StaticResource MonoInput}" Padding="12,10,70,10" IsReadOnly="True"/>
+                                        <Button Content="&#xE8A7;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding LaunchExternalUrlCommand}" CommandParameter="{Binding SelectedVaultItem.Url}"/>
                                     </Grid>
                                 </StackPanel>
 
@@ -362,7 +365,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="🛡" FontSize="16" Margin="0,0,12,0"/>
+                                    <TextBlock Text="&#xEA18;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,12,0"/>
                                     <StackPanel Grid.Column="1">
                                         <TextBlock Text="MFA Enabled" Style="{StaticResource BaseText}" FontWeight="SemiBold"/>
                                         <TextBlock Text="{Binding SelectedVaultItem.MfaStatus}" Style="{StaticResource LabelText}" FontWeight="Normal"/>
@@ -374,7 +377,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="📅" FontSize="16" Margin="0,0,12,0"/>
+                                    <TextBlock Text="&#xE787;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,12,0"/>
                                     <StackPanel Grid.Column="1">
                                         <TextBlock Text="Last Rotated" Style="{StaticResource BaseText}" FontWeight="SemiBold"/>
                                         <TextBlock Text="12 days ago" Style="{StaticResource LabelText}" FontWeight="Normal"/>
@@ -386,7 +389,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="✓" FontSize="16" Margin="0,0,12,0" Foreground="{StaticResource PrimaryBrush}"/>
+                                    <TextBlock Text="&#xE81C;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,12,0" Foreground="{StaticResource PrimaryBrush}"/>
                                     <StackPanel Grid.Column="1">
                                         <TextBlock Text="Breach Status" Style="{StaticResource BaseText}" FontWeight="SemiBold"/>
                                         <TextBlock Text="{Binding SelectedVaultItem.BreachStatus}" Style="{StaticResource LabelText}" FontWeight="Normal"/>
@@ -410,7 +413,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <!-- Icon Badge -->
                                                 <Border Width="24" Height="24" CornerRadius="12" Background="#F1F5F9" Margin="0,0,12,0" VerticalAlignment="Top">
-                                                    <TextBlock Text="•" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}"/>
+                                                    <TextBlock Text="{Binding IconType, Converter={StaticResource IconConverter}}" FontFamily="Segoe MDL2 Assets" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}"/>
                                                 </Border>
                                                 <StackPanel Grid.Column="1">
                                                     <TextBlock Text="{Binding ActionType}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="13"/>
@@ -429,5 +432,21 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
+
+        <!-- Toast Overlay -->
+        <Border Background="#333333" CornerRadius="8" Padding="16,8"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,32">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsToastVisible}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <TextBlock Text="{Binding ToastMessage}" Foreground="White" FontWeight="Medium" FontSize="14"/>
+        </Border>
     </Grid>
 </Window>
