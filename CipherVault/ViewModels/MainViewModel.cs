@@ -19,10 +19,18 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
+        public ObservableCollection<VaultItem> VaultItems { get; } = new();
+        public ObservableCollection<VaultItem> FilteredVaultItems { get; } = new();
+
         public MainViewModel()
         {
-            // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var mockItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,15 +53,47 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+            VaultItems.Add(mockItem);
+            FilteredVaultItems.Add(mockItem);
+
+            _selectedVaultItem = mockItem;
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilteredVaultItems.Clear();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                foreach (var item in VaultItems)
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
+            else
+            {
+                var lowerValue = value.ToLowerInvariant();
+                foreach (var item in VaultItems)
+                {
+                    if (item.Title.ToLowerInvariant().Contains(lowerValue) ||
+                        item.Subtitle.ToLowerInvariant().Contains(lowerValue) ||
+                        item.Category.ToLowerInvariant().Contains(lowerValue))
+                    {
+                        FilteredVaultItems.Add(item);
+                    }
+                }
+            }
         }
 
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async System.Threading.Tasks.Task CopyToClipboard(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                ToastMessage = "Copied to clipboard";
+                IsToastVisible = true;
+                await System.Threading.Tasks.Task.Delay(2000);
+                IsToastVisible = false;
             }
         }
 
@@ -82,19 +122,25 @@ namespace CipherVault.ViewModels
         [RelayCommand]
         private void EditItem()
         {
-            // Edit item logic
+            ToastMessage = "Item edited";
+            IsToastVisible = true;
+            _ = System.Threading.Tasks.Task.Delay(2000).ContinueWith(_ => IsToastVisible = false);
         }
 
         [RelayCommand]
         private void DeleteItem()
         {
-            // Delete item logic
+            ToastMessage = "Item deleted";
+            IsToastVisible = true;
+            _ = System.Threading.Tasks.Task.Delay(2000).ContinueWith(_ => IsToastVisible = false);
         }
 
         [RelayCommand]
         private void AddNewItem()
         {
-            // Add new item logic
+            ToastMessage = "Item added";
+            IsToastVisible = true;
+            _ = System.Threading.Tasks.Task.Delay(2000).ContinueWith(_ => IsToastVisible = false);
         }
     }
 }
