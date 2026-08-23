@@ -5,6 +5,7 @@ using CipherVault.Models;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Threading.Tasks;
 
 namespace CipherVault.ViewModels
 {
@@ -18,6 +19,12 @@ namespace CipherVault.ViewModels
 
         [ObservableProperty]
         private string _searchText = string.Empty;
+
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        private ObservableCollection<VaultItem> _vaultItems;
+        public ObservableCollection<VaultItem> FilteredVaultItems { get; } = new ObservableCollection<VaultItem>();
 
         public MainViewModel()
         {
@@ -45,15 +52,44 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            _vaultItems = new ObservableCollection<VaultItem> { _selectedVaultItem };
+            FilteredVaultItems.Add(_selectedVaultItem);
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilteredVaultItems.Clear();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                foreach (var item in _vaultItems)
+                    FilteredVaultItems.Add(item);
+            }
+            else
+            {
+                var lowerValue = value.ToLowerInvariant();
+                foreach (var item in _vaultItems)
+                {
+                    if (item.Title.ToLowerInvariant().Contains(lowerValue) ||
+                        item.Subtitle.ToLowerInvariant().Contains(lowerValue) ||
+                        item.Category.ToLowerInvariant().Contains(lowerValue) ||
+                        item.Username.ToLowerInvariant().Contains(lowerValue))
+                    {
+                        FilteredVaultItems.Add(item);
+                    }
+                }
+            }
         }
 
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async Task CopyToClipboard(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                IsToastVisible = true;
+                await Task.Delay(2000);
+                IsToastVisible = false;
             }
         }
 
