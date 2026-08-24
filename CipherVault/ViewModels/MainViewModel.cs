@@ -19,10 +19,19 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        public ObservableCollection<VaultItem> VaultItems { get; } = new ObservableCollection<VaultItem>();
+        public ObservableCollection<VaultItem> FilteredVaultItems { get; } = new ObservableCollection<VaultItem>();
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var item = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,15 +54,46 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            VaultItems.Add(item);
+            FilteredVaultItems.Add(item);
+            _selectedVaultItem = item;
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilteredVaultItems.Clear();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                foreach (var item in VaultItems)
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
+            else
+            {
+                var lowerValue = value.ToLowerInvariant();
+                foreach (var item in VaultItems)
+                {
+                    if (item.Title.ToLowerInvariant().Contains(lowerValue) ||
+                        item.Category.ToLowerInvariant().Contains(lowerValue))
+                    {
+                        FilteredVaultItems.Add(item);
+                    }
+                }
+            }
         }
 
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async System.Threading.Tasks.Task CopyToClipboard(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                ToastMessage = "Copied to clipboard";
+                IsToastVisible = true;
+                await System.Threading.Tasks.Task.Delay(3000);
+                IsToastVisible = false;
             }
         }
 
