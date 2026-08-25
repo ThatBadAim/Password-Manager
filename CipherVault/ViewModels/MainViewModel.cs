@@ -5,24 +5,36 @@ using CipherVault.Models;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CipherVault.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
         [ObservableProperty]
-        private VaultItem _selectedVaultItem;
+        private VaultItem? _selectedVaultItem;
 
         [ObservableProperty]
         private bool _isPasswordVisible;
 
         [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
+        [ObservableProperty]
         private string _searchText = string.Empty;
+
+        private ObservableCollection<VaultItem> _allVaultItems;
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _filteredVaultItems = new();
 
         public MainViewModel()
         {
-            // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var item = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,15 +57,38 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            _allVaultItems = new ObservableCollection<VaultItem> { item };
+            FilteredVaultItems = new ObservableCollection<VaultItem>(_allVaultItems);
+            SelectedVaultItem = FilteredVaultItems.FirstOrDefault();
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                FilteredVaultItems = new ObservableCollection<VaultItem>(_allVaultItems);
+            }
+            else
+            {
+                var lowerValue = value.ToLowerInvariant();
+                FilteredVaultItems = new ObservableCollection<VaultItem>(
+                    _allVaultItems.Where(i => i.Title.ToLowerInvariant().Contains(lowerValue) ||
+                                              i.Subtitle.ToLowerInvariant().Contains(lowerValue))
+                );
+            }
         }
 
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async Task CopyToClipboardAsync(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                ToastMessage = "Copied to clipboard";
+                IsToastVisible = true;
+                await Task.Delay(2000);
+                IsToastVisible = false;
             }
         }
 
