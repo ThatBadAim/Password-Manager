@@ -19,10 +19,13 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        private readonly ObservableCollection<VaultItem> _vaultItems = new();
+        public ObservableCollection<VaultItem> FilteredVaultItems { get; } = new();
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var mockItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,6 +48,35 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            _vaultItems.Add(mockItem);
+            FilteredVaultItems.Add(mockItem);
+            _selectedVaultItem = mockItem;
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilteredVaultItems.Clear();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                foreach (var item in _vaultItems)
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
+            else
+            {
+                var lowerSearch = value.ToLowerInvariant();
+                foreach (var item in _vaultItems)
+                {
+                    if (item.Title.ToLowerInvariant().Contains(lowerSearch) ||
+                        item.Username.ToLowerInvariant().Contains(lowerSearch) ||
+                        item.Url.ToLowerInvariant().Contains(lowerSearch))
+                    {
+                        FilteredVaultItems.Add(item);
+                    }
+                }
+            }
         }
 
         [RelayCommand]
