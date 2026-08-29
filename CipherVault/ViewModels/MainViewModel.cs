@@ -5,19 +5,34 @@ using CipherVault.Models;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace CipherVault.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
         [ObservableProperty]
-        private VaultItem _selectedVaultItem;
+        private VaultItem? _selectedVaultItem;
 
         [ObservableProperty]
         private bool _isPasswordVisible;
 
         [ObservableProperty]
         private string _searchText = string.Empty;
+
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string? _toastMessage;
+
+        private readonly ObservableCollection<VaultItem> _allVaultItems;
+
+        public ObservableCollection<VaultItem> FilteredVaultItems { get; }
+
+        private int _toastCounter = 0;
 
         public MainViewModel()
         {
@@ -45,15 +60,57 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            _allVaultItems = new ObservableCollection<VaultItem>
+            {
+                _selectedVaultItem
+            };
+            FilteredVaultItems = new ObservableCollection<VaultItem>(_allVaultItems);
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilteredVaultItems.Clear();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                foreach (var item in _allVaultItems)
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
+            else
+            {
+                var lowerValue = value.ToLowerInvariant();
+                var filtered = _allVaultItems.Where(i =>
+                    (i.Title != null && i.Title.ToLowerInvariant().Contains(lowerValue)) ||
+                    (i.Category != null && i.Category.ToLowerInvariant().Contains(lowerValue)) ||
+                    (i.Username != null && i.Username.ToLowerInvariant().Contains(lowerValue)));
+
+                foreach (var item in filtered)
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
+
+            SelectedVaultItem = FilteredVaultItems.FirstOrDefault();
         }
 
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async Task CopyToClipboardAsync(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                ToastMessage = "Copied to clipboard";
+                IsToastVisible = true;
+
+                var currentCounter = Interlocked.Increment(ref _toastCounter);
+                await Task.Delay(2000);
+
+                if (currentCounter == _toastCounter)
+                {
+                    IsToastVisible = false;
+                }
             }
         }
 
