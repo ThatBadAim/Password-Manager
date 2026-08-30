@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CipherVault"
         xmlns:viewmodels="clr-namespace:CipherVault.ViewModels"
+        xmlns:converters="clr-namespace:CipherVault.Converters"
         mc:Ignorable="d"
         Title="CipherVault" Height="768" Width="1024"
         Background="#F8FAFC"
@@ -15,6 +16,8 @@
     </Window.DataContext>
 
     <Window.Resources>
+        <converters:IconConverter x:Key="IconConverter"/>
+
         <!-- Colors -->
         <SolidColorBrush x:Key="BgBrush" Color="#F8FAFC"/>
         <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
@@ -45,7 +48,7 @@
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Background" Value="#F1F5F9"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Padding" Value="12,10,70,10"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -125,6 +128,8 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -134,6 +139,12 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                    <Setter Property="Background" Value="#E2E8F0"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
     </Window.Resources>
@@ -286,8 +297,8 @@
                                 <StackPanel Margin="0,0,0,20">
                                     <TextBlock Text="USERNAME / EMAIL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
-                                        <TextBox Text="{Binding SelectedVaultItem.Username}"  IsReadOnly="True"/>
-                                        <Button Content="Copy" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.Username}"/>
+                                        <TextBox Text="{Binding SelectedVaultItem.Username}" Style="{StaticResource MonoInput}" IsReadOnly="True"/>
+                                        <Button Content="&#xE8C8;" ToolTip="Copy Username" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.Username}"/>
                                     </Grid>
                                 </StackPanel>
 
@@ -295,7 +306,8 @@
                                 <StackPanel Margin="0,0,0,8">
                                     <TextBlock Text="PASSWORD" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
-                                        <TextBox  IsReadOnly="True" x:Name="PasswordBox">
+                                        <!-- Using two TextBoxes to simulate PasswordBox because true PasswordBox doesn't support easy dynamic plain text toggling -->
+                                        <TextBox IsReadOnly="True">
                                             <TextBox.Style>
                                                 <Style TargetType="TextBox" BasedOn="{StaticResource MonoInput}">
                                                     <Setter Property="Text" Value="••••••••••••••••••••"/>
@@ -307,9 +319,23 @@
                                                 </Style>
                                             </TextBox.Style>
                                         </TextBox>
+
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
-                                            <Button Content="Show" Style="{StaticResource ActionBtn}" Command="{Binding TogglePasswordVisibilityCommand}"/>
-                                            <Button Content="Copy" Style="{StaticResource ActionBtn}" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.EncryptedPassword}"/>
+                                            <Button Command="{Binding TogglePasswordVisibilityCommand}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource ActionBtn}">
+                                                        <Setter Property="Content" Value="&#xE890;"/>
+                                                        <Setter Property="ToolTip" Value="Show Password"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
+                                                                <Setter Property="Content" Value="&#xE8D4;"/>
+                                                                <Setter Property="ToolTip" Value="Hide Password"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button Content="&#xE8C8;" ToolTip="Copy Password" Style="{StaticResource ActionBtn}" Command="{Binding CopyToClipboardCommand}" CommandParameter="{Binding SelectedVaultItem.EncryptedPassword}"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
@@ -334,8 +360,8 @@
                                 <StackPanel Margin="0,0,0,24">
                                     <TextBlock Text="WEBSITE / URL" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
                                     <Grid>
-                                        <TextBox Text="{Binding SelectedVaultItem.Url}"  IsReadOnly="True"/>
-                                        <Button Content="Open" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding LaunchExternalUrlCommand}" CommandParameter="{Binding SelectedVaultItem.Url}"/>
+                                        <TextBox Text="{Binding SelectedVaultItem.Url}" Style="{StaticResource MonoInput}" IsReadOnly="True"/>
+                                        <Button Content="&#xE8A7;" ToolTip="Open URL" Style="{StaticResource ActionBtn}" HorizontalAlignment="Right" Margin="4" Command="{Binding LaunchExternalUrlCommand}" CommandParameter="{Binding SelectedVaultItem.Url}"/>
                                     </Grid>
                                 </StackPanel>
 
@@ -410,7 +436,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <!-- Icon Badge -->
                                                 <Border Width="24" Height="24" CornerRadius="12" Background="#F1F5F9" Margin="0,0,12,0" VerticalAlignment="Top">
-                                                    <TextBlock Text="•" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}"/>
+                                    <TextBlock Text="{Binding IconType, Converter={StaticResource IconConverter}}" FontFamily="Segoe MDL2 Assets" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource TextMutedBrush}"/>
                                                 </Border>
                                                 <StackPanel Grid.Column="1">
                                                     <TextBlock Text="{Binding ActionType}" Style="{StaticResource BaseText}" FontWeight="SemiBold" FontSize="13"/>
@@ -429,5 +455,25 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
+
+        <!-- Toast Notification -->
+        <Border HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,32"
+                Background="#333333" CornerRadius="8" Padding="16,12"
+                IsHitTestVisible="False">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Opacity" Value="0"/>
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsToastVisible}" Value="True">
+                            <Setter Property="Opacity" Value="1"/>
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <TextBlock Text="{Binding ToastMessage}" Foreground="White" FontWeight="SemiBold" FontSize="14"/>
+        </Border>
+
     </Grid>
 </Window>
