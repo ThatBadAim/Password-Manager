@@ -5,6 +5,9 @@ using CipherVault.Models;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Linq;
 
 namespace CipherVault.ViewModels
 {
@@ -19,10 +22,24 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _vaultItems = new();
+
+        [ObservableProperty]
+        private ObservableCollection<VaultItem> _filteredVaultItems = new();
+
+        private int _toastCounter;
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var mockItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,15 +62,57 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            VaultItems.Add(mockItem);
+            FilteredVaultItems = new ObservableCollection<VaultItem>(VaultItems);
+            SelectedVaultItem = FilteredVaultItems.FirstOrDefault();
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                FilteredVaultItems = new ObservableCollection<VaultItem>(VaultItems);
+            }
+            else
+            {
+                var searchLower = value.ToLowerInvariant();
+                var filtered = VaultItems.Where(i =>
+                    (i.Title?.ToLowerInvariant()?.Contains(searchLower) ?? false) ||
+                    (i.Category?.ToLowerInvariant()?.Contains(searchLower) ?? false) ||
+                    (i.Username?.ToLowerInvariant()?.Contains(searchLower) ?? false));
+
+                FilteredVaultItems = new ObservableCollection<VaultItem>(filtered);
+            }
+
+            if (!FilteredVaultItems.Contains(SelectedVaultItem))
+            {
+                SelectedVaultItem = FilteredVaultItems.FirstOrDefault();
+            }
         }
 
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async Task CopyToClipboardAsync(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                await ShowToastAsync("Copied to clipboard");
+            }
+        }
+
+        private async Task ShowToastAsync(string message)
+        {
+            ToastMessage = message;
+            IsToastVisible = true;
+
+            var currentToastId = Interlocked.Increment(ref _toastCounter);
+
+            await Task.Delay(3000);
+
+            if (currentToastId == _toastCounter)
+            {
+                IsToastVisible = false;
             }
         }
 
