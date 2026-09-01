@@ -11,7 +11,7 @@ namespace CipherVault.ViewModels
     public partial class MainViewModel : ObservableObject
     {
         [ObservableProperty]
-        private VaultItem _selectedVaultItem;
+        private VaultItem? _selectedVaultItem;
 
         [ObservableProperty]
         private bool _isPasswordVisible;
@@ -19,10 +19,21 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
+        public ObservableCollection<VaultItem> VaultItems { get; } = new();
+        public ObservableCollection<VaultItem> FilteredVaultItems { get; } = new();
+
+        private int _toastCounter;
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var githubItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,15 +56,80 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            var extraItem = new VaultItem
+            {
+                Title = "Extra Item",
+                Subtitle = "For Search Testing",
+                Category = "Test",
+                Username = "test.user",
+                EncryptedPassword = "test_password",
+                Url = "https://example.com"
+            };
+
+            VaultItems.Add(githubItem);
+            VaultItems.Add(extraItem);
+
+            foreach (var item in VaultItems)
+            {
+                FilteredVaultItems.Add(item);
+            }
+
+            _selectedVaultItem = githubItem;
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilteredVaultItems.Clear();
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                foreach (var item in VaultItems)
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
+            else
+            {
+                var lowerSearch = value.ToLowerInvariant();
+                foreach (var item in VaultItems)
+                {
+                    if (item.Title?.ToLowerInvariant().Contains(lowerSearch) == true ||
+                        item.Subtitle?.ToLowerInvariant().Contains(lowerSearch) == true ||
+                        item.Category?.ToLowerInvariant().Contains(lowerSearch) == true)
+                    {
+                        FilteredVaultItems.Add(item);
+                    }
+                }
+            }
+
+            if (FilteredVaultItems.Count > 0 && (SelectedVaultItem == null || !FilteredVaultItems.Contains(SelectedVaultItem)))
+            {
+                SelectedVaultItem = FilteredVaultItems[0];
+            }
+            else if (FilteredVaultItems.Count == 0)
+            {
+                SelectedVaultItem = null;
+            }
         }
 
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async System.Threading.Tasks.Task CopyToClipboardAsync(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                ToastMessage = "Copied to clipboard";
+                IsToastVisible = true;
+
+                int currentCounter = System.Threading.Interlocked.Increment(ref _toastCounter);
+
+                await System.Threading.Tasks.Task.Delay(3000);
+
+                if (currentCounter == _toastCounter)
+                {
+                    IsToastVisible = false;
+                }
             }
         }
 
