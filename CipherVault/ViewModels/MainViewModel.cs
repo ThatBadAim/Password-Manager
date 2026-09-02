@@ -19,10 +19,21 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
+        private int _toastCounter = 0;
+
+        public ObservableCollection<VaultItem> AllVaultItems { get; } = new();
+        public ObservableCollection<VaultItem> FilteredVaultItems { get; } = new();
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var mockItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,6 +56,43 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            AllVaultItems.Add(mockItem);
+            FilteredVaultItems.Add(mockItem);
+            _selectedVaultItem = mockItem;
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilteredVaultItems.Clear();
+            var lowerVal = value?.ToLowerInvariant() ?? string.Empty;
+
+            foreach (var item in AllVaultItems)
+            {
+                if (string.IsNullOrEmpty(lowerVal) ||
+                    (item.Title?.ToLowerInvariant().Contains(lowerVal) == true) ||
+                    (item.Category?.ToLowerInvariant().Contains(lowerVal) == true))
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
+
+            if (SelectedVaultItem == null || !FilteredVaultItems.Contains(SelectedVaultItem))
+            {
+                SelectedVaultItem = FilteredVaultItems.Count > 0 ? FilteredVaultItems[0] : null!;
+            }
+        }
+
+        private async void ShowToast(string message)
+        {
+            ToastMessage = message;
+            IsToastVisible = true;
+            int currentCount = System.Threading.Interlocked.Increment(ref _toastCounter);
+            await System.Threading.Tasks.Task.Delay(3000);
+            if (currentCount == _toastCounter)
+            {
+                IsToastVisible = false;
+            }
         }
 
         [RelayCommand]
@@ -53,7 +101,7 @@ namespace CipherVault.ViewModels
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                ShowToast("Copied to clipboard");
             }
         }
 
@@ -71,6 +119,7 @@ namespace CipherVault.ViewModels
                 try
                 {
                     Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                    ShowToast("Opening URL...");
                 }
                 catch (Exception ex)
                 {
