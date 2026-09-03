@@ -5,13 +5,15 @@ using CipherVault.Models;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CipherVault.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
         [ObservableProperty]
-        private VaultItem _selectedVaultItem;
+        private VaultItem? _selectedVaultItem;
 
         [ObservableProperty]
         private bool _isPasswordVisible;
@@ -19,10 +21,21 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
+        public ObservableCollection<VaultItem> VaultItems { get; } = new();
+        public ObservableCollection<VaultItem> FilteredVaultItems { get; } = new();
+
+        private int _toastRequestCount;
+
         public MainViewModel()
         {
             // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            var mockItem = new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -45,15 +58,61 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
             };
+
+            VaultItems.Add(mockItem);
+            FilteredVaultItems.Add(mockItem);
+            SelectedVaultItem = mockItem;
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilteredVaultItems.Clear();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                foreach (var item in VaultItems)
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
+            else
+            {
+                var lowerValue = value.ToLowerInvariant();
+                foreach (var item in VaultItems)
+                {
+                    if (item.Title?.ToLowerInvariant().Contains(lowerValue) == true ||
+                        item.Category?.ToLowerInvariant().Contains(lowerValue) == true)
+                    {
+                        FilteredVaultItems.Add(item);
+                    }
+                }
+            }
+
+            // Update the active context logically since there is no master list view
+            SelectedVaultItem = FilteredVaultItems.Count > 0 ? FilteredVaultItems[0] : null;
+        }
+
+        private async Task ShowToast(string message)
+        {
+            var currentRequestId = Interlocked.Increment(ref _toastRequestCount);
+
+            ToastMessage = message;
+            IsToastVisible = true;
+
+            await Task.Delay(3000); // Wait for 3 seconds
+
+            if (currentRequestId == _toastRequestCount)
+            {
+                IsToastVisible = false;
+            }
         }
 
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async Task CopyToClipboard(string? text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                await ShowToast("Copied to clipboard");
             }
         }
 
@@ -64,7 +123,7 @@ namespace CipherVault.ViewModels
         }
 
         [RelayCommand]
-        private void LaunchExternalUrl(string url)
+        private void LaunchExternalUrl(string? url)
         {
             if (!string.IsNullOrEmpty(url))
             {
