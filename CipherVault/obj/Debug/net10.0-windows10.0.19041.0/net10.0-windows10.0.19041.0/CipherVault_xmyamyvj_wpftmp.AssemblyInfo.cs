@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CipherVault")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a9ef2e789a0dfde3bb33f7e6c76ae77443679d38")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e3d863aded87cd00609aca25b928a6d5222cd674")]
 [assembly: System.Reflection.AssemblyProductAttribute("CipherVault")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CipherVault")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
