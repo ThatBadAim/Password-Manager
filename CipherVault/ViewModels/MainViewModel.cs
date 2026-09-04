@@ -5,13 +5,16 @@ using CipherVault.Models;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace CipherVault.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
         [ObservableProperty]
-        private VaultItem _selectedVaultItem;
+        private VaultItem? _selectedVaultItem;
 
         [ObservableProperty]
         private bool _isPasswordVisible;
@@ -19,10 +22,21 @@ namespace CipherVault.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private bool _isToastVisible;
+
+        [ObservableProperty]
+        private string _toastMessage = string.Empty;
+
+        public ObservableCollection<VaultItem> FilteredVaultItems { get; } = new();
+
+        private readonly ObservableCollection<VaultItem> _masterVaultItems = new();
+        private int _toastOperationId = 0;
+
         public MainViewModel()
         {
-            // Initialize with mock data for GitHub Dev Account
-            _selectedVaultItem = new VaultItem
+            // Initialize with mock data
+            _masterVaultItems.Add(new VaultItem
             {
                 Title = "GitHub",
                 Subtitle = "Personal Development Account",
@@ -44,16 +58,78 @@ namespace CipherVault.ViewModels
                     new AuditLogEntry { Timestamp = DateTime.Now.AddDays(-5), ActionType = "Username Copied", ActionDescription = "Username copied to clipboard", IconType = "Copy" },
                     new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-6), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
                 }
-            };
+            });
+
+            _masterVaultItems.Add(new VaultItem
+            {
+                Title = "Azure Portal",
+                Subtitle = "Enterprise Cloud Services",
+                Category = "Work Account",
+                Username = "alex.c@example.com",
+                EncryptedPassword = "azure_password_123!",
+                Url = "https://portal.azure.com",
+                Notes = "Use for deploying cloud infrastructure.",
+                Badges = new System.Collections.Generic.List<string> { "WORK", "CLOUD" },
+                SecurityScore = 90,
+                MfaEnabled = true,
+                MfaStatus = "Authenticator App",
+                LastRotated = DateTime.Now.AddDays(-30),
+                BreachStatus = "No leaks detected",
+                AuditLogs = new System.Collections.Generic.List<AuditLogEntry>
+                {
+                    new AuditLogEntry { Timestamp = DateTime.Now.AddMonths(-1), ActionType = "Entry Created", ActionDescription = "Vault item initially created", IconType = "Plus" }
+                }
+            });
+
+            foreach(var item in _masterVaultItems)
+            {
+                FilteredVaultItems.Add(item);
+            }
+
+            _selectedVaultItem = FilteredVaultItems.FirstOrDefault();
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            FilteredVaultItems.Clear();
+            var searchLower = value?.ToLowerInvariant() ?? string.Empty;
+
+            foreach (var item in _masterVaultItems)
+            {
+                if (string.IsNullOrWhiteSpace(searchLower) ||
+                    (item.Title?.ToLowerInvariant().Contains(searchLower) == true) ||
+                    (item.Category?.ToLowerInvariant().Contains(searchLower) == true))
+                {
+                    FilteredVaultItems.Add(item);
+                }
+            }
+
+            if (SelectedVaultItem != null && !FilteredVaultItems.Contains(SelectedVaultItem))
+            {
+                SelectedVaultItem = FilteredVaultItems.FirstOrDefault();
+            }
+            else if (SelectedVaultItem == null)
+            {
+                SelectedVaultItem = FilteredVaultItems.FirstOrDefault();
+            }
         }
 
         [RelayCommand]
-        private void CopyToClipboard(string text)
+        private async Task CopyToClipboardAsync(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 Clipboard.SetText(text);
-                // In a real app, you might show a toast notification here
+                ToastMessage = "Copied to clipboard!";
+                IsToastVisible = true;
+
+                int currentOpId = Interlocked.Increment(ref _toastOperationId);
+                await Task.Delay(3000);
+
+                if (currentOpId == _toastOperationId)
+                {
+                    IsToastVisible = false;
+                }
             }
         }
 
